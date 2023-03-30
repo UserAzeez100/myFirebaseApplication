@@ -36,12 +36,13 @@ import java.util.ArrayList;
  */
 public class ProdectFragment extends Fragment {
 
-    BottomSheetEditProdectBinding bindingSheet;
+    //Todo:step 1
+    BottomSheetEditProdectBinding BottomSheetBinding;
     BottomSheetDialog bottomSheetDialog;
     FragmentProdectBinding binding;
     FirebaseFirestore db;
 
-    EditText nameEt,descriptionEt;
+
 
 
 
@@ -98,11 +99,8 @@ public class ProdectFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProdectBinding.inflate(inflater, container, false);
-        bindingSheet = BottomSheetEditProdectBinding.inflate(inflater, container, false);
+        BottomSheetBinding = BottomSheetEditProdectBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
-
-        nameEt =bindingSheet.newProdectNameEt.findViewById(R.id.newProdectNameEt);
-        descriptionEt =bindingSheet.newProdectDecriptionEt.findViewById(R.id.newProdectDecriptionEt);
 
 
 
@@ -117,56 +115,37 @@ public class ProdectFragment extends Fragment {
         });
 
 
-        ArrayList<ProdectClass> arrayList = new ArrayList<>();
-        arrayList.add(new ProdectClass("aaaaaaaa", "sssdbhluifbhusdb"));
-        arrayList.add(new ProdectClass("dfggff", "scrvtbdnsvcxacsrvdt"));
-        arrayList.add(new ProdectClass("dsrw", "sadcfscghfbuilhsdr"));
-        arrayList.add(new ProdectClass("tesc", "ersvvrvvvvvvvvvvvvv"));
-
-
-        RecyclerProdectsAdapter adapter = new RecyclerProdectsAdapter(arrayList);
-
-        binding.reciclerContaner.setAdapter(adapter);
-        binding.reciclerContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
-                RecyclerView.VERTICAL, false));
-
 
         return binding.getRoot();
     }
 
     private void showBottomSheetDialog() {
+
         if (bottomSheetDialog == null) {
             bottomSheetDialog = new BottomSheetDialog(requireContext());
-            bottomSheetDialog.setContentView(bindingSheet.getRoot());
+            bottomSheetDialog.setContentView(BottomSheetBinding.getRoot());
+            bottomSheetDialog.getWindow().setBackgroundDrawableResource(R.drawable.botoom_sheet_shape);
 
-//Todo:i check here please wait to update the code:::!!!!!!!!!!!!!!!
-            bottomSheetDialog.findViewById(R.id.editBtn).setOnClickListener(new View.OnClickListener() {
+
+
+            BottomSheetBinding.editBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String pName = BottomSheetBinding.newProdectNameEt.getText().toString();
+                    String pDescription = BottomSheetBinding.newProdectDecriptionEt.getText().toString();
 
+                    //  text input  validation:
+                    if (!pName.isEmpty()&&!pDescription.isEmpty()) {
 
-
-
-                    String pName = nameEt.getText().toString();
-                    String pDescription = descriptionEt.getText().toString();
-                    Log.e(TAG, "onClick: asdfasfgfewrgwergvw"+pName+"****"+pDescription );
-
-
-
-                    Log.e(TAG, "onClick: "+nameEt.getText().toString()+"-------"+descriptionEt.getText().toString() );
-                    if (nameEt==null) {
-                        Log.d(TAG, "onClick: "+ pDescription +"------"+pName);
                         ProdectClass prodectClass = new ProdectClass(pName, pDescription);
-                        //add to fire store:
-                        addNewProdectToFirebaseStore(prodectClass);
+
+                        addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
+                        addToRecicler(prodectClass);//add new item
+
 //                     bottomSheetDialog.dismiss();
 
                     } else
                         Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();}
-
-
-
-
             });
         }
         bottomSheetDialog.show();
@@ -196,6 +175,19 @@ public class ProdectFragment extends Fragment {
                         Log.w(TAG, "Error adding document", e);
                     }
                 });
+
+    }
+    private void addToRecicler(ProdectClass prodectClass){
+        ArrayList<ProdectClass> arrayList = new ArrayList<>();
+        arrayList.add(prodectClass);
+
+
+        RecyclerProdectsAdapter adapter = new RecyclerProdectsAdapter(arrayList);
+
+        binding.reciclerContaner.setAdapter(adapter);
+        binding.reciclerContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
+                RecyclerView.VERTICAL, false));
+
 
     }
 
