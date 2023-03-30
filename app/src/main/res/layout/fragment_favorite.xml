@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.FavoriteFragment">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rectangleContaner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        style="@style/Platform.MaterialComponents.Light"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:inputType="textPassword"-->
+<!--        android:layout_marginHorizontal="20dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_marginBottom="1dp"-->
+<!--        android:hint="a_old_password">-->
+
+
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--            android:id="@+id/oldPassword"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="45dp"-->
+<!--            android:inputType="textPassword"-->
+<!--            android:maxLength="8" />-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+</FrameLayout>
