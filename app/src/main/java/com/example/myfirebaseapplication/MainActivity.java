@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 auth.signOut();
                                 errorDialog();
-
                             }
 
 

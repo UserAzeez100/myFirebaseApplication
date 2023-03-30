@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
 
+
     <TextView
         android:id="@+id/screenTitle"
         android:layout_width="match_parent"
@@ -17,11 +18,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/guestBtn"
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/screenTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/key" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/signOutBtn"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/screenTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/log_out2" />
+
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/screenText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🎗️  Login 🎗️"
+        android:text=" Login "
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="20sp"

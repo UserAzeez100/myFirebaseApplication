@@ -1,5 +1,7 @@
 package com.example.myfirebaseapplication;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -9,12 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.developer.kalert.KAlertDialog;
-import com.example.myfirebaseapplication.databinding.ActivityRegisterBinding;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -28,74 +31,130 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
+
+
 public class RegisterActivity extends AppCompatActivity {
-    ActivityRegisterBinding  binding;
-    GoogleSignInAccount account;
+    com.example.myfirebaseapplication.databinding.ActivityRegisterBinding binding;
+    GoogleSignInAccount googleAccount;
 
     private ActivityResultLauncher<Intent> mStartForResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding= ActivityRegisterBinding.inflate(getLayoutInflater());
+        binding = com.example.myfirebaseapplication.databinding.ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
+        //back to login
         binding.loginTextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(RegisterActivity.this,MainActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
+        //when you click phone icon:
+        binding.signInPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                binding.passwordEt.setHint("enter your phone :_ _ _ _ _ _ _")
+//                binding.passwordEt.setInputType(InputType.TYPE_CLASS_PHONE);
+                binding.phoneEt.setVisibility(View.VISIBLE);
+                binding.passwordEt.setVisibility(View.GONE);
+                binding.emilEt.setVisibility(View.GONE);
+            }
+        });
+        //when you click email icon:
+        binding.signInEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        binding.button.setOnClickListener(new View.OnClickListener() {
+                binding.phoneEt.setVisibility(View.GONE);
+                binding.passwordEt.setVisibility(View.VISIBLE);
+                binding.emilEt.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //validation the edite texts:
+        binding.registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String uEmail=binding.emilEt.getText().toString();
-                String uPassword=binding.passwordEt.getText().toString();
-                if (!uEmail.isEmpty()){
-                    if (!uPassword.isEmpty()&&uPassword.length()>=6){
-                        //sign Up by email ::
-                        signUpWithEmail( uEmail, uPassword);
+                String nameU = binding.nameEt.getText().toString();
+                String passwordU = binding.passwordEt.getText().toString();
+                String countryU = binding.countryEt.getText().toString();
+                String phoneU = binding.phoneEt.getText().toString().trim();
+                String emailU = binding.emilEt.getText().toString();
 
+                if(binding.phoneEt.getVisibility()==INVISIBLE){
+                    if (!nameU.isEmpty()){
+                    if (!emailU.isEmpty()) {
+                        if (!passwordU.isEmpty() && passwordU.length() >= 6) {
+                            if (!countryU.isEmpty()){
 
+                            //sign Up by email ::
+                            signUpWithEmail(emailU, passwordU);
 
-                    }else Toast.makeText(RegisterActivity.this, "you must enter >=6 vales in password ", Toast.LENGTH_SHORT).show();
-                }else Toast.makeText(RegisterActivity.this, "you cant keep the email empty ", Toast.LENGTH_SHORT).show();
+                            } else
+                                Toast.makeText(RegisterActivity.this, "you cant keep the country empty ", Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(RegisterActivity.this, "you must enter >=6 vales in password ", Toast.LENGTH_SHORT).show();
+                    } else
+                         Toast.makeText(RegisterActivity.this, "you cant keep the email empty ", Toast.LENGTH_SHORT).show();
+               } else
+                   Toast.makeText(RegisterActivity.this, "you cant keep the name empty ", Toast.LENGTH_SHORT).show();
+
+                }else  if (!nameU.isEmpty()||!countryU.isEmpty()){
+                    if (!phoneU.isEmpty()||phoneU.length() > 12){
+
+                        Intent intent = new Intent(RegisterActivity.this, VerificationActivity.class);
+                        intent.putExtra("phone",phoneU);
+                        startActivity(intent);
+
+                    }else binding.phoneEt.setError("Enter a valid mobile");
+
+                } else
+                    Toast.makeText(RegisterActivity.this, "you cant keep any inputText empty ", Toast.LENGTH_SHORT).show();
 
             }
         });
 
         // Initialize the ActivityResultLauncher object
-        mStartForResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        // Handle the result of the Google Sign-In flow
-                        handleSignInResult(data);
-                    }
-                });
+        mStartForResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                Intent data = result.getData();
+                // Handle the result of the Google Sign-In
+                handleSignInResult(data);
+            }
+        });
 
 
-        //google button::
+        //google button icon::
         binding.signInGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.wep_client))
-                        .requestEmail()
-                        .build();
-                GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(RegisterActivity.this, gso);
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                mStartForResultLauncher.launch(signInIntent);
+                googleSignInIntoMyApp();
 
             }
-
         });
 
-        binding.signInGest.setOnClickListener(new View.OnClickListener() {
+        //guest button icon::
+        binding.gaeustText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 guest();
@@ -104,77 +163,85 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     }
-    private void guest(){
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-        @Override
-        public void onComplete(@NonNull Task<AuthResult> task) {
-            if (task.isSuccessful()) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                Intent intent=new Intent(RegisterActivity.this,HomeActivity.class);
-                startActivity(intent);
 
-            } else {
-                Toast.makeText(RegisterActivity.this, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show();
 
+
+    //sign in as guest method:
+    private void guest() {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+
+                }
             }
-        }
-    });
+        });
     }
+
+    //sign in with email and password function:
     private void signUpWithEmail(String email, String password) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser user = auth.getCurrentUser();
-                            user.sendEmailVerification();
-                            auth.signOut();
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = auth.getCurrentUser();
+                    user.sendEmailVerification();
 
-                            successDialog();
+                    successDialog();
 
 
-                        } else {
-                            // If sign up fails, display a message to the user
-                            Toast.makeText(RegisterActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                } else {
+                    // If sign up fails, display a message to the user
+                    Toast.makeText(RegisterActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                    auth.signOut();
+                }
+            }
+        });
     }
 
-    void successDialog(){
-        new KAlertDialog(this, KAlertDialog.SUCCESS_TYPE)
-                .setTitleText("Good job!")
-                .setContentText("You created a new account successfully")
-                .setConfirmClickListener("OK", new KAlertDialog.KAlertClickListener() {
-                    @Override
-                    public void onClick(KAlertDialog kAlertDialog) {
-                        kAlertDialog.dismissWithAnimation();
-                        Intent intent=new Intent(RegisterActivity.this,MainActivity.class);
-                        startActivity(intent);
+    //alert dialog success massage:
+    void successDialog() {
+        new KAlertDialog(this, KAlertDialog.SUCCESS_TYPE).setTitleText("Good job!").setContentText("You created a new account successfully").setConfirmClickListener("OK", new KAlertDialog.KAlertClickListener() {
+            @Override
+            public void onClick(KAlertDialog kAlertDialog) {
+                kAlertDialog.dismissWithAnimation();
+                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                startActivity(intent);
 
-                    }
-                }).show();
-
+            }
+        }).show();
 
 
     }
-    void firebaseAuthWithGoogle(String   account){
-     FirebaseAuth   mAuth = FirebaseAuth.getInstance();
+
+    //connect the firebase with google account and update UI:
+    void firebaseAuthWithGoogle(String account) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         AuthCredential credential = GoogleAuthProvider.getCredential(account, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Log.d(TAG, "signInWithCredential:success");
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-                    }
-                });
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                // Sign in success:
+                Toast.makeText(RegisterActivity.this, "abcd"+FirebaseAuth.getInstance().getCurrentUser(), Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(RegisterActivity.this, HomeActivity.class);
+                startActivity(intent);
+
+                FirebaseUser user = mAuth.getCurrentUser();
+                Log.d(TAG, "signInWithCredential:success");
+            } else {
+                // If sign in fails:
+                Toast.makeText(this, "bad", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "signInWithCredential:failure", task.getException());
+            }
+        });
 
     }
 
@@ -182,15 +249,24 @@ mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<Aut
         Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
         try {
             // Google Sign-In was successful, authenticate with Firebase
-             account = task.getResult(ApiException.class);
-            firebaseAuthWithGoogle(account.getIdToken());
+            googleAccount = task.getResult(ApiException.class);
+            firebaseAuthWithGoogle(googleAccount.getIdToken());
+
+
         } catch (ApiException e) {
             // Google Sign-In failed, update UI appropriately
             Log.w(TAG, "Google sign in failed", e);
         }
     }
 
+    private void googleSignInIntoMyApp() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.wep_client)).requestEmail().build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(RegisterActivity.this, gso);
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        mStartForResultLauncher.launch(signInIntent);
 
+
+    }
 
 
 }

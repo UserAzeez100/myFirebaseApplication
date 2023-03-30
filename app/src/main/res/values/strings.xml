@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">My firebase Application</string>
     <string name="wep_client"> 747874154449-3715k08kci7ovj4reqdphhhf6e8h88hn.apps.googleusercontent.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
