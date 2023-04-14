@@ -49,7 +49,7 @@ public class VerificationActivity extends AppCompatActivity {
 
         if (!cadeMassage.isEmpty()||cadeMassage.length() > 6){
 
-            sendVerificationCode(phoneNumber);
+            verifyVerificationCode(cadeMassage);
 
         }else binding.codeMassageEt.setError("Enter a valid  code");
 

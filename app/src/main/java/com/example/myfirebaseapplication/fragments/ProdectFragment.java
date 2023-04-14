@@ -1,10 +1,20 @@
 package com.example.myfirebaseapplication.fragments;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,37 +23,65 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.myfirebaseapplication.R;
 import com.example.myfirebaseapplication.databinding.BottomSheetEditProdectBinding;
 import com.example.myfirebaseapplication.databinding.FragmentProdectBinding;
+import com.example.myfirebaseapplication.other.MyInterFace;
 import com.example.myfirebaseapplication.other.ProdectClass;
-import com.example.myfirebaseapplication.other.RecyclerProdectsAdapter;
+import com.example.myfirebaseapplication.other.RecyclerProductsAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ProdectFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProdectFragment extends Fragment {
+public class ProdectFragment extends Fragment implements MyInterFace {
 
     //Todo:step 1
-    BottomSheetEditProdectBinding BottomSheetBinding;
+    BottomSheetEditProdectBinding bottomSheetBinding;
     BottomSheetDialog bottomSheetDialog;
     FragmentProdectBinding binding;
     FirebaseFirestore db;
+    ArrayList<ProdectClass> arrayList = new ArrayList<>();
+    ProdectClass prodectClass;
+    RecyclerProductsAdapter adapter;
+    CollectionReference usersCollectionRef;
+    ProdectClass oldProdect;
+    String name;
+    String description;
+    String pName;
+    String pDescription;
+    ActivityResultLauncher launcher;
 
 
+    FirebaseStorage firebaseStorage;
+    StorageReference storageRef;
+    UploadTask uploadTask;
 
+    Uri uriUpload;
+    String imageString;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -99,64 +137,163 @@ public class ProdectFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProdectBinding.inflate(inflater, container, false);
-        BottomSheetBinding = BottomSheetEditProdectBinding.inflate(inflater, container, false);
+        bottomSheetBinding = BottomSheetEditProdectBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
+        usersCollectionRef = db.collection("products");
+
+        firebaseStorage = FirebaseStorage.getInstance();
+        storageRef = firebaseStorage.getReference();
 
 
+        launcher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+
+                    public void onActivityResult(ActivityResult result) {
+
+                        if (result.getResultCode() == RESULT_OK) {
+                            Intent i = result.getData();
+                             uriUpload = i.getData();
+                            Glide.with(getActivity()).load(uriUpload).circleCrop().into(bottomSheetBinding.imageView);
+                            imageString = uriUpload.toString();
 
 
+                        } else if (result.getResultCode() == RESULT_CANCELED) {
+                            bottomSheetBinding.imageView.setImageResource(R.drawable.img);
+//                            retrieveImageFromFireStore("azeezImage");
+                        }
+                    }
+                }
+        );
 
+
+//         documentRef = db.collection("products").document(Objects.requireNonNull(auth.getUid()));
 
         binding.addProdectIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showBottomSheetDialog();
+                showBottomSheetDialog_add();
+            }
+        });
+        return binding.getRoot();
+    }
+
+    //bottom Sheet add new product:
+    private void showBottomSheetDialog_add() {
+
+        if (bottomSheetDialog == null) {
+            bottomSheetDialog = new BottomSheetDialog(requireContext());
+            bottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
+        }
+        bottomSheetBinding.imageView.setImageResource(R.drawable.img);
+
+
+
+        bottomSheetBinding.saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                pName = bottomSheetBinding.newProdectNameEt.getText().toString();
+                pDescription = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
+
+
+                //  text input  validation:
+                if (!pName.isEmpty() && !pDescription.isEmpty()) {
+
+                    prodectClass = new ProdectClass(pName, pDescription);
+                    prodectClass.setId(arrayList.size());
+                    prodectClass.setImageString(imageString);
+
+//                    DateFormat dtForm = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.");
+//                    String date = dtForm.format(Calendar.getInstance().getTime());
+//                    String fileName = date + FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                    uploadImageToFirebase(uriUpload, ""+arrayList.size());//upload Image To Firebase:
+                    addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
+                    addToReciclerFunction(prodectClass);//add new item
+
+
+//                     bottomSheetDialog.dismiss();
+
+                } else
+                    Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();
+            }
+        });
+        bottomSheetDialog.show();
+//        Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(bottomSheetBinding.imageView);
+        bottomSheetBinding.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                launcher.launch(intent);
+
             }
         });
 
 
-
-        return binding.getRoot();
     }
 
-    private void showBottomSheetDialog() {
+    //bottom Sheet Edit product:
+    private void showBottomSheetDialog_edit(String name, String description, String image, int position) {
 
         if (bottomSheetDialog == null) {
+
             bottomSheetDialog = new BottomSheetDialog(requireContext());
-            bottomSheetDialog.setContentView(BottomSheetBinding.getRoot());
-            bottomSheetDialog.getWindow().setBackgroundDrawableResource(R.drawable.botoom_sheet_shape);
-
-
-
-            BottomSheetBinding.editBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String pName = BottomSheetBinding.newProdectNameEt.getText().toString();
-                    String pDescription = BottomSheetBinding.newProdectDecriptionEt.getText().toString();
-
-                    //  text input  validation:
-                    if (!pName.isEmpty()&&!pDescription.isEmpty()) {
-
-                        ProdectClass prodectClass = new ProdectClass(pName, pDescription);
-
-                        addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
-                        addToRecicler(prodectClass);//add new item
-
-//                     bottomSheetDialog.dismiss();
-
-                    } else
-                        Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();}
-            });
+            bottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
         }
+        bottomSheetDialog.getWindow().setBackgroundDrawableResource(R.drawable.botoom_sheet_shape);
+
+//            bottomSheetBinding.imageView.setImageURI(image);
+        bottomSheetBinding.newProdectNameEt.setText(name);
+        bottomSheetBinding.newProdectDecriptionEt.setText(description);
+
+        bottomSheetBinding.saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oldProdect = new ProdectClass(name, description);
+
+                pName = bottomSheetBinding.newProdectNameEt.getText().toString();
+                pDescription = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
+                //image-----------------
+
+                //  text input  validation:
+                if (!pName.isEmpty() && !pDescription.isEmpty()) {
+
+                    prodectClass = new ProdectClass(pName, pDescription);
+
+
+                    arrayList.get(position).setProdectName(prodectClass.getProdectName());
+                    arrayList.get(position).setProdectDescription(prodectClass.getProdectDescription());
+                    adapter.notifyItemChanged(position);
+
+                    Log.e("Edit", "onClick: " + pName + "------" + pDescription);
+
+
+//                        documentRef.set(prodectClass);
+
+                    updateDataInFirebase(oldProdect, mapFuc(prodectClass));////update data in fire store:
+                    bottomSheetDialog.dismiss();
+                    bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            bottomSheetBinding.newProdectNameEt.setText("");
+                            bottomSheetBinding.newProdectDecriptionEt.setText("");
+
+                        }
+                    });
+
+                } else
+                    Toast.makeText(getActivity(), " enter the data ", Toast.LENGTH_SHORT).show();
+            }
+        });
+//        bottomSheetBinding.newProdectNameEt.setText(name);
+//        bottomSheetBinding.newProdectDecriptionEt.setText(description);
         bottomSheetDialog.show();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
 
     }
+
 
     // add New Prodect To Firebase Store function:
     private void addNewProdectToFirebaseStore(ProdectClass prodect) {
@@ -177,18 +314,305 @@ public class ProdectFragment extends Fragment {
                 });
 
     }
-    private void addToRecicler(ProdectClass prodectClass){
-        ArrayList<ProdectClass> arrayList = new ArrayList<>();
-        arrayList.add(prodectClass);
 
+    //update in fire store:
+    private void updateDataInFirebase(ProdectClass oldProduct, Map map) {
 
-        RecyclerProdectsAdapter adapter = new RecyclerProdectsAdapter(arrayList);
+        usersCollectionRef
+                .whereEqualTo("prodectName", oldProduct.getProdectName())
+                .whereEqualTo("prodectDescription", oldProduct.getProdectDescription())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (!task.getResult().getDocuments().isEmpty()) {
+                                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                    usersCollectionRef.document(document.getId())
+                                            .set((map), SetOptions.merge())
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
 
-        binding.reciclerContaner.setAdapter(adapter);
-        binding.reciclerContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
-                RecyclerView.VERTICAL, false));
+                                                    Toast.makeText(getActivity(), "Document updated successfully", Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e("eroooor", "onFailure: " + e);
+                                                    Toast.makeText(getActivity(), "Error updating document" + e, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+                                }
+                            }
+                        } else {
+
+                            Log.e(TAG, "Error getting documents.", task.getException());
+                            Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
 
 
     }
 
+    //read all data from firebase Store:
+    private void readAllDataFromFirebase() {
+        db.collection("products")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                prodectClass = document.toObject(ProdectClass.class);
+
+                                addToReciclerFunction(prodectClass);//"we handling the data here in recycler"
+
+                            }
+                        } else {
+                            Log.w(TAG, "Error_ada", task.getException());
+                        }
+                    }
+                });
+    }
+
+    //"we handling the data here in recycler"
+    private void addToReciclerFunction(ProdectClass prodectClass) {
+        arrayList.add(prodectClass);
+        adapter = new RecyclerProductsAdapter(arrayList, this);
+
+        binding.reciclerContaner.setAdapter(adapter);
+        binding.reciclerContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
+                RecyclerView.VERTICAL, false));
+        adapter.notifyDataSetChanged();
+
+
+    }
+
+
+    private Map<String, Object> mapFuc(ProdectClass prodectClass) {
+        Map<String, Object> productMap = new HashMap<>();
+        productMap.put("prodectName", prodectClass.getProdectName());
+        productMap.put("prodectDescription", prodectClass.getProdectDescription());
+        productMap.put("favoriteBool", prodectClass.isFavoriteBool());
+
+
+        Log.e("map", "mapFuc: " + prodectClass.getProdectDescription() + "/////" + prodectClass.getProdectName() + "/////");
+//        productMap.put("productImage",productImage);
+
+//        updateDataInFirebase();
+        return productMap;
+    }
+
+
+    @Override// when edit:::"
+    public void getPositionInterface(int position) {
+        String image = arrayList.get(position).getImageString();
+        name = arrayList.get(position).getProdectName();
+        description = arrayList.get(position).getProdectDescription();
+
+        showBottomSheetDialog_edit(name, description, image, position);
+
+
+//        arrayList.set(position,prodectClass);
+
+
+    }
+
+    //delete from fire store :
+    void deleteFromFireStore(ProdectClass prodectClass) {
+        usersCollectionRef.whereEqualTo("prodectName", prodectClass.getProdectName())
+                .whereEqualTo("prodectDescription", prodectClass.getProdectDescription())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (!task.getResult().getDocuments().isEmpty()) {
+                                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                    usersCollectionRef.document(document.getId()).delete()
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+
+                                                    Toast.makeText(getActivity(), "Document deleted successfully", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e("eroooor", "onFailure: " + e);
+
+                                                }
+                                            });
+                                }
+                            }
+                        } else {
+
+                            Log.e(TAG, "Error getting documents.", task.getException());
+                            Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+    }
+
+    @Override//when delete:
+    public void deletePosition(int position) {
+        name = arrayList.get(position).getProdectName();
+        description = arrayList.get(position).getProdectDescription();
+
+        prodectClass = new ProdectClass(name, description);
+
+        deleteFromFireStore(prodectClass);
+        arrayList.remove(position);
+        adapter.getItemCount();
+        adapter.notifyDataSetChanged();
+
+
+    }
+
+    //update heart :
+    @Override
+    public void heartPosition(int position, Boolean status) {
+        String image = arrayList.get(position).getImageString();
+        name = arrayList.get(position).getProdectName();
+        description = arrayList.get(position).getProdectDescription();
+        int id = arrayList.get(position).getId();
+
+        arrayList.get(position).setFavoriteBool(status);
+        updateDataInFirebaseF(status, id);
+
+
+        Toast.makeText(getContext(), "its added to favorite activity", Toast.LENGTH_SHORT).show();
+
+
+    }
+
+
+    //update in fire store fav:
+    private void updateDataInFirebaseF(boolean b, int id) {
+        Map<String, Boolean> productMap = new HashMap<>();
+        productMap.put("favoriteBool", b);
+        usersCollectionRef.whereEqualTo("id", id).
+                get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (!task.getResult().getDocuments().isEmpty()) {
+                                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                    usersCollectionRef.document(document.getId()).
+                                            set((productMap), SetOptions.merge())
+
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+//                                                    readAllDataFromFirebase();
+                                                    Toast.makeText(getActivity(), "fav updated successfully", Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e("eroooor", "onFailure: " + e);
+                                                    Toast.makeText(getActivity(), "Error updating fav" + e, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+                                }
+                            }
+
+                        } else {
+
+                            Log.e(TAG, "Error getting fav.", task.getException());
+                            Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+
+
+    }
+
+    //upload Image To Firebase
+    private void uploadImageToFirebase(Uri uri, String imageName) {
+        StorageReference  storageRef2 =  FirebaseStorage.getInstance()
+                .getReference().child("productsImage/" + imageName+".jpg");
+
+
+        uploadTask = storageRef2.putFile(uri);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(getActivity(), "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("TAG", "Error uploading image: " + exception.getMessage());
+            }
+        });
+
+    }
+
+    //retrieve Image From FireStore:
+    private void retrieveImageFromFireStore(String imageName) {
+
+            StorageReference storageRef = firebaseStorage.getReference().child("productsImage/" +imageName+".jpg" );
+            storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+//            String imageString=uri.toString();
+                    Glide.with(getActivity()).load(uri).circleCrop().into(bottomSheetBinding.imageView);
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("TAG", "onFailure:image download!! ");
+                    Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(bottomSheetBinding.imageView);
+
+
+                }
+            });
+        }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        readAllDataFromFirebase();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        arrayList.clear();
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        for (int i = 0; i <= arrayList.size(); i++) {
+            retrieveImageFromFireStore(i+".jpg");
+        }
+    }
 }
+

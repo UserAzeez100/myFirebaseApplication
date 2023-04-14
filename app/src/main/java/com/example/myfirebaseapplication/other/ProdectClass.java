@@ -2,13 +2,34 @@ package com.example.myfirebaseapplication.other;
 
 public class ProdectClass {
 
-    private String prodectName, prodectDescription,imageString;
+    private String prodectName , prodectDescription , imageString ;
+    private  boolean favoriteBool=false;
+    private  int id;
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public ProdectClass() {
+
+    }
 
     public ProdectClass(String prodectName, String prodectDescription) {
         this.prodectName = prodectName;
         this.prodectDescription = prodectDescription;
 
+    }
+
+    public boolean isFavoriteBool() {
+        return favoriteBool;
+    }
+
+    public void setFavoriteBool(boolean favoriteBool) {
+        this.favoriteBool = favoriteBool;
     }
 
     public String getProdectName() {
@@ -17,14 +38,6 @@ public class ProdectClass {
 
     public void setProdectName(String prodectName) {
         this.prodectName = prodectName;
-    }
-
-    public String getServiceType() {
-        return prodectDescription;
-    }
-
-    public void setServiceType(String serviceType) {
-        this.prodectDescription = serviceType;
     }
 
     public String getProdectDescription() {

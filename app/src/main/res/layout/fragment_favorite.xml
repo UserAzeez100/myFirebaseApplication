@@ -12,6 +12,17 @@
         android:layout_height="match_parent" />
 
 
+    <TextView
+        android:id="@+id/textLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textStyle="normal"
+        android:textColor="#92A1880D"
+        android:text="💔 No Fovrite Items 💔 "
+        android:layout_gravity="center"/>
+
+
 <!--    <com.google.android.material.textfield.TextInputLayout-->
 <!--        style="@style/Platform.MaterialComponents.Light"-->
 <!--        android:layout_width="match_parent"-->

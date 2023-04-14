@@ -21,7 +21,7 @@ public class SplashActivity extends AppCompatActivity {
     FirebaseUser currentUser;
 
     Animation bottom_animation, middleAnimation, top_animation;
-    private static int SPLASH_TIME_OUT = 4000;
+    private static int SPLASH_TIME_OUT = 2000;
     SharedPreferences sharedPreferences;
 
 
