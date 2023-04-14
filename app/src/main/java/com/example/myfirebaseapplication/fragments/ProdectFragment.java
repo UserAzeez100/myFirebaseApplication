@@ -71,8 +71,8 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     ProdectClass oldProdect;
     String name;
     String description;
-    String pName;
-    String pDescription;
+    String pNameEt;
+    String pDescriptionEt;
     ActivityResultLauncher launcher;
 
 
@@ -193,14 +193,14 @@ public class ProdectFragment extends Fragment implements MyInterFace {
             @Override
             public void onClick(View v) {
 
-                pName = bottomSheetBinding.newProdectNameEt.getText().toString();
-                pDescription = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
+                pNameEt = bottomSheetBinding.newProdectNameEt.getText().toString();
+                pDescriptionEt = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
 
 
                 //  text input  validation:
-                if (!pName.isEmpty() && !pDescription.isEmpty()) {
+                if (!pNameEt.isEmpty() && !pDescriptionEt.isEmpty()) {
 
-                    prodectClass = new ProdectClass(pName, pDescription);
+                    prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
                     prodectClass.setId(arrayList.size());
                     prodectClass.setImageString(imageString);
 
@@ -208,12 +208,12 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 //                    String date = dtForm.format(Calendar.getInstance().getTime());
 //                    String fileName = date + FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                    uploadImageToFirebase(uriUpload, ""+arrayList.size());//upload Image To Firebase:
+                    uploadImageToFirebase(uriUpload, prodectClass.getId());//upload Image To Firebase:
                     addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
                     addToReciclerFunction(prodectClass);//add new item
 
 
-//                     bottomSheetDialog.dismiss();
+                    Log.e("imageId", "onClick: "+prodectClass.getId()+"===array:==="+arrayList.size() );
 
                 } else
                     Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();
@@ -236,16 +236,17 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     }
 
     //bottom Sheet Edit product:
-    private void showBottomSheetDialog_edit(String name, String description, String image, int position) {
+    private void showBottomSheetDialog_edit(String name, String description, int imageName, int position) {
 
         if (bottomSheetDialog == null) {
 
             bottomSheetDialog = new BottomSheetDialog(requireContext());
             bottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
         }
-        bottomSheetDialog.getWindow().setBackgroundDrawableResource(R.drawable.botoom_sheet_shape);
+        bottomSheetBinding.imageView.setImageResource(R.drawable.img);
 
-//            bottomSheetBinding.imageView.setImageURI(image);
+
+        retrieveImageFromFireStore(imageName);//retrieve Image From FireStore and put in a image sheet
         bottomSheetBinding.newProdectNameEt.setText(name);
         bottomSheetBinding.newProdectDecriptionEt.setText(description);
 
@@ -254,26 +255,25 @@ public class ProdectFragment extends Fragment implements MyInterFace {
             public void onClick(View v) {
                 oldProdect = new ProdectClass(name, description);
 
-                pName = bottomSheetBinding.newProdectNameEt.getText().toString();
-                pDescription = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
-                //image-----------------
+                pNameEt = bottomSheetBinding.newProdectNameEt.getText().toString();
+                pDescriptionEt = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
 
                 //  text input  validation:
-                if (!pName.isEmpty() && !pDescription.isEmpty()) {
+                if (!pNameEt.isEmpty() && !pDescriptionEt.isEmpty()) {
 
-                    prodectClass = new ProdectClass(pName, pDescription);
+                    prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
+                    prodectClass.setImageString(imageString);
 
+                    uploadImageToFirebase(uriUpload, imageName);//upload Image To Firebase:
+                    updateDataInFirebase(oldProdect, mapFuc(prodectClass));////update data in fire store:
 
                     arrayList.get(position).setProdectName(prodectClass.getProdectName());
                     arrayList.get(position).setProdectDescription(prodectClass.getProdectDescription());
+                    arrayList.get(position).setImageString(prodectClass.getImageString());
                     adapter.notifyItemChanged(position);
 
-                    Log.e("Edit", "onClick: " + pName + "------" + pDescription);
 
 
-//                        documentRef.set(prodectClass);
-
-                    updateDataInFirebase(oldProdect, mapFuc(prodectClass));////update data in fire store:
                     bottomSheetDialog.dismiss();
                     bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
@@ -286,11 +286,22 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
                 } else
                     Toast.makeText(getActivity(), " enter the data ", Toast.LENGTH_SHORT).show();
+
             }
         });
 //        bottomSheetBinding.newProdectNameEt.setText(name);
 //        bottomSheetBinding.newProdectDecriptionEt.setText(description);
         bottomSheetDialog.show();
+        bottomSheetBinding.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                launcher.launch(intent);
+
+            }
+        });
 
     }
 
@@ -413,7 +424,7 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
     @Override// when edit:::"
     public void getPositionInterface(int position) {
-        String image = arrayList.get(position).getImageString();
+        int image = arrayList.get(position).getId();
         name = arrayList.get(position).getProdectName();
         description = arrayList.get(position).getProdectDescription();
 
@@ -467,13 +478,16 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     public void deletePosition(int position) {
         name = arrayList.get(position).getProdectName();
         description = arrayList.get(position).getProdectDescription();
+        int imageId =arrayList.get(position).getId();
 
         prodectClass = new ProdectClass(name, description);
 
+        deleteImageFromFirebaseStorage(imageId);
         deleteFromFireStore(prodectClass);
-        arrayList.remove(position);
+        arrayList.remove(position);//delete item:
         adapter.getItemCount();
         adapter.notifyDataSetChanged();
+
 
 
     }
@@ -481,13 +495,16 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     //update heart :
     @Override
     public void heartPosition(int position, Boolean status) {
-        String image = arrayList.get(position).getImageString();
+        int image = arrayList.get(position).getId();
         name = arrayList.get(position).getProdectName();
         description = arrayList.get(position).getProdectDescription();
         int id = arrayList.get(position).getId();
 
+
         arrayList.get(position).setFavoriteBool(status);
         updateDataInFirebaseF(status, id);
+
+//        Log.e("heart", "heartPosition: position::"+id +"======idI===="+image );
 
 
         Toast.makeText(getContext(), "its added to favorite activity", Toast.LENGTH_SHORT).show();
@@ -543,11 +560,10 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     }
 
     //upload Image To Firebase
-    private void uploadImageToFirebase(Uri uri, String imageName) {
+    private void uploadImageToFirebase(Uri uri, int imageName) {
         StorageReference  storageRef2 =  FirebaseStorage.getInstance()
-                .getReference().child("productsImage/" + imageName+".jpg");
-
-
+                .getReference().child("productsImage/"+ imageName);
+//        storageRef2.getName();
         uploadTask = storageRef2.putFile(uri);
 
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -565,9 +581,9 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     }
 
     //retrieve Image From FireStore:
-    private void retrieveImageFromFireStore(String imageName) {
+    private void retrieveImageFromFireStore(int imageName) {
 
-            StorageReference storageRef = firebaseStorage.getReference().child("productsImage/" +imageName+".jpg" );
+            StorageReference storageRef = firebaseStorage.getReference().child("productsImage/" +imageName );
             storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
@@ -584,6 +600,24 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
                 }
             });
+        }
+
+        //delete Image FromFirebase Storage:
+        private void deleteImageFromFirebaseStorage(int imageName){
+        StorageReference sr= firebaseStorage.getReference().child("productsImage/"+imageName);
+        sr.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "onSuccess: image Deleted");
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "onFailure: image not Deleted !!");
+
+            }
+        });
         }
 
 
@@ -611,7 +645,7 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         for (int i = 0; i <= arrayList.size(); i++) {
-            retrieveImageFromFireStore(i+".jpg");
+            retrieveImageFromFireStore(i);
         }
     }
 }
