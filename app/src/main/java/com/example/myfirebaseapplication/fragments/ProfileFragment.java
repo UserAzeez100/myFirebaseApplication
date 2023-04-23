@@ -3,9 +3,11 @@ package com.example.myfirebaseapplication.fragments;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -24,16 +26,29 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.developer.kalert.KAlertDialog;
 import com.example.myfirebaseapplication.MainActivity;
 import com.example.myfirebaseapplication.R;
 import com.example.myfirebaseapplication.databinding.FragmentProfileBinding;
+import com.example.myfirebaseapplication.other.UserData;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -43,9 +58,14 @@ import com.squareup.picasso.Picasso;
 public class ProfileFragment extends Fragment {
 
     FragmentProfileBinding binding;
-    FirebaseStorage storage;
-    StorageReference storageRef;
+    FirebaseStorage firebaseStorage;
     UploadTask uploadTask;
+    FirebaseFirestore db;
+    CollectionReference usersCollectionRef;
+    UserData userData;
+    FirebaseUser firebaseAuth;
+
+    StorageReference storageRef;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -93,28 +113,42 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false);
-        storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
+        firebaseStorage = FirebaseStorage.getInstance();
 
 
+        db = FirebaseFirestore.getInstance();
+        usersCollectionRef = db.collection("profileData");
+         firebaseAuth =FirebaseAuth.getInstance().getCurrentUser();
+        readAllDataFromFirebase();
+
+
+
+        binding.EditeProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String country = binding.clintcuontyEt.getText().toString();
+                String name = binding.clintNameEt.getText().toString();
+
+                if (!country.isEmpty() && !name.isEmpty()) {
+                    userData.setName(name);
+                    userData.setCountry(country);
+                    Log.e(TAG, "onClick: " + name + "country:" + country + "////old///");
+
+                    updateDataInFirebase( userData);
+
+                } else
+                    Toast.makeText(getActivity(), "you cant send empty data ", Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
 
         binding.logeOutTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //sign out :
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-
-                    FirebaseAuth.getInstance().signOut();
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    startActivity(intent);
-
-                    Toast.makeText(getActivity(), "You signed out " + FirebaseAuth.getInstance().getCurrentUser(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), "no Accounts 😣", Toast.LENGTH_SHORT).show();
-                }
-
+                errorDialog();
             }
         });
 
@@ -132,7 +166,7 @@ public class ProfileFragment extends Fragment {
 
 
                         } else if (result.getResultCode() == RESULT_CANCELED) {
-                            binding.imageViewProfile.setImageResource(R.drawable.img);
+//                            binding.imageViewProfile.setImageResource(R.drawable.img);
                             retrieveImageFromFireStore("azeezImage");
                         }
                     }
@@ -154,9 +188,10 @@ public class ProfileFragment extends Fragment {
 
         return binding.getRoot();
     }
-//upload Image To Firebase:
+
+    //upload Image To Firebase:
     private void uploadImageToFirebase(Uri uri, String imageName) {
-        storageRef = storageRef.child("images/"+imageName);
+        StorageReference storageRef = firebaseStorage.getReference().child("images/" + imageName);
         uploadTask = storageRef.putFile(uri);
 
         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -172,10 +207,11 @@ public class ProfileFragment extends Fragment {
         });
 
     }
-//retrieve Image From FireStore:
+
+    //retrieve Image From FireStore:
     private void retrieveImageFromFireStore(String imageName) {
-        StorageReference storageRef = storage.getReference().child("images/"+imageName);
-        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        StorageReference storageRef1 = firebaseStorage.getReference().child("images/" + imageName);
+        storageRef1.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
 //            String imageString=uri.toString();
@@ -185,7 +221,7 @@ public class ProfileFragment extends Fragment {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e("TAG", "onFailure:image download!! " );
+                Log.e("TAG", "onFailure:image download!! ");
                 Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(binding.imageViewProfile);
 
 
@@ -203,7 +239,127 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-                retrieveImageFromFireStore("azeezImage");
+        retrieveImageFromFireStore("azeezImage");
     }
 
+    //errorDialog for sign out:
+    void errorDialog() {
+
+        new KAlertDialog(getActivity(), KAlertDialog.WARNING_TYPE)
+                .setTitleText("Are you sure")
+                .setContentText("you want to sign out ‼")
+                .setConfirmClickListener("Yes", new KAlertDialog.KAlertClickListener() {
+                    @Override
+                    public void onClick(KAlertDialog kAlertDialog) {
+                        kAlertDialog.dismissWithAnimation();
+
+                        //sign out :
+                        if (firebaseAuth != null) {
+
+                            FirebaseAuth.getInstance().signOut();
+                            Intent intent = new Intent(getActivity(), MainActivity.class);
+                            startActivity(intent);
+
+                            Log.e("account", "onClick: "+ firebaseAuth);
+                            Toast.makeText(getActivity(), "You signed out successfully" + firebaseAuth, Toast.LENGTH_SHORT).show();
+
+                        } else {
+                            kAlertDialog.dismissWithAnimation();
+                            Toast.makeText(getActivity(), "no Accounts 😣", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                }).setCancelClickListener("Cancel", new KAlertDialog.KAlertClickListener() {
+                    @Override
+                    public void onClick(KAlertDialog kAlertDialog) {
+                        kAlertDialog.dismissWithAnimation();
+                    }
+                }).confirmButtonColor(R.color.blue)
+                .show();
+    }
+
+    //read all data from firebase Store:
+    private void readAllDataFromFirebase() {
+        db.collection("profileData")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                userData = document.toObject(UserData.class);
+
+                                binding.clintNameEt.setText(firebaseAuth.getDisplayName());
+                                binding.clintNameTv.setText("M."+ firebaseAuth.getDisplayName());
+                                binding.clintcuontyEt.setText(userData.getCountry());
+                                if (firebaseAuth.isEmailVerified()){
+                                       binding.clintEmailTv.setText(firebaseAuth.getEmail());
+
+                                }else
+                                    binding.clintEmailTv.setText(firebaseAuth.getPhoneNumber());
+                            }
+                        } else {
+                            Log.w(TAG, "Error_read:", task.getException());
+                        }
+                    }
+                });
+
+
+    }
+
+
+    //update user data in fire store ::
+    private void updateDataInFirebase( UserData newData) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("name", newData.getName());
+        userMap.put("country", newData.getCountry());
+//                whereEqualTo("country",  oldData.getCountry())
+        usersCollectionRef.
+                whereEqualTo("id","1")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (!task.getResult().getDocuments().isEmpty()) {
+                                for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                                    usersCollectionRef.document(document.getId()).
+                                            set((userMap), SetOptions.merge())
+
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    readAllDataFromFirebase();
+//
+                                                    Toast.makeText(getActivity(), "User updated successfully", Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.e("eroooor", "onFailure: " + e);
+                                                    Toast.makeText(getActivity(), "Error updating fav" + e, Toast.LENGTH_SHORT).show();
+
+                                                }
+                                            });
+                                }
+                            }
+
+                        } else {
+
+                            Log.e(TAG, "Error getting User data.", task.getException());
+                            Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                });
+
+
+    }
+
+
 }
+

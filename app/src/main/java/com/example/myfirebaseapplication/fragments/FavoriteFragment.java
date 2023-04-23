@@ -99,35 +99,6 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
         db = FirebaseFirestore.getInstance();
         usersCollectionRef = db.collection("products");
 
-
-
-//        Log.d("TAGGG", "onCreateView: " + prodectClass.isFavoriteBool());
-
-//        Intent intent = new Intent();
-//        String name        = intent.getStringExtra("name");
-//        String description = intent.getStringExtra("description");
-//        boolean fa         = intent.getBooleanExtra("favourite", false);
-
-
-//        ProdectClass prodectClass =new ProdectClass(name,description);
-//        prodectClass.setFavoriteBool(fa);
-
-
-
-
-
-
-//        binding=FragmentFavoriteBinding.inflate(inflater,container,false);
-//
-//
-//        ArrayList<ProdectClass> arrayList=new ArrayList<>();
-//
-//        RecyclerProdectsAdapter adapter = new RecyclerProdectsAdapter(arrayList,this);
-//
-//        binding.rectangleContaner.setAdapter(adapter);
-//        binding.rectangleContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
-//                RecyclerView.VERTICAL, false));
-
         return binding.getRoot();
     }
 

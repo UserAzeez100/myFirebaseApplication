@@ -23,7 +23,7 @@
             android:id="@+id/materialTextView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginTop="80dp"
             android:background="@drawable/profile_shape"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -33,7 +33,7 @@
             android:id="@+id/imageViewProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="30dp"
             android:src="@drawable/img"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,55 +43,125 @@
             android:id="@+id/clintNameTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:gravity="center"
-            android:text="M.Ahmad Taweel"
+            android:layout_marginTop="90dp"
+            android:text="🧑‍💻 M.Ahmad Taweel"
             android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imageViewProfile" />
+            app:layout_constraintTop_toTopOf="@+id/materialTextView" />
 
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/clintPlaceTv"
+            android:id="@+id/clintEmailTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="UAE"
+            android:text="UAE@gmail.com"
             android:textColor="#C3C122"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/clintNameTv" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/textView3"
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/layout"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="280dp"
             android:layout_marginTop="10dp"
             android:background="@color/white"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/materialTextView" >
+
+
+            <!--=======================================================================================================-->
+
+            <com.google.android.material.textfield.TextInputLayout
+
+                style="@style/Platform.MaterialComponents.Light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp"
+                android:hint="Clint Name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/clintNameEt"
+                    style="@style/TextAppearance.AppCompat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textColor="#1B5E20"
+                    android:inputType="text"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!--=======================================================================================================-->
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Platform.MaterialComponents.Light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="3dp"
+                android:hint="Clint Country">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/clintcuontyEt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    android:textColor="#1B5E20"
+                    tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!--=======================================================================================================-->
+
+            <Button
+                android:id="@+id/EditeProfileBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="43dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/shape_base_btn"
+                android:text="Edite Profile"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/logeOutTv"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="10dp"
-            android:background="@color/white"
+            android:background="@drawable/log_out_shape"
+            style="@style/MyTextViewStyle"
             android:gravity="center"
-            android:text="Log Out "
+            android:text="‍💻 Log Out ‍💻 "
             android:textColor="#0779DD"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:layout_constraintTop_toBottomOf="@+id/layout"
              />
 
 

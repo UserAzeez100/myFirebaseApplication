@@ -19,16 +19,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/guestBtn"
-        android:layout_width="20dp"
-        android:layout_height="25dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/screenTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/key" />
-
-    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/signOutBtn"
         android:layout_width="20dp"
         android:layout_height="20dp"
@@ -54,57 +44,107 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/emilEt"
-        android:layout_width="match_parent"
-        android:layout_height="59dp"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="196dp"
-        android:hint="enter your email"
-        android:inputType="textEmailAddress"
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/layout"
+        android:layout_width="409dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/screenTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/screenTitle">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/registerTextBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:gravity="center"
-        android:text="you dont have account?  REGISTER →"
-        android:textColor="#1A237E"
-        android:textSize="15sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="100dp"
+            android:layout_marginTop="30dp"
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/buttonLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="80dp"
-        android:background="@drawable/shape_base_btn"
-        android:text="LOGIN"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/registerTextBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordEt" />
+            app:srcCompat="@drawable/fiebase_imge" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/passwordEt"
-        android:layout_width="match_parent"
-        android:layout_height="59dp"
-        android:layout_marginHorizontal="25dp"
-        android:layout_marginTop="20dp"
-        android:hint="enter your password"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emilEt" />
+
+
+        <!--=======================================================================================================-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            app:endIconMode="clear_text"
+            style="@style/Platform.MaterialComponents.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="10dp"
+            android:hint="Email">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailEt"
+                style="@style/TextAppearance.AppCompat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:textColor="#1B5E20"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--=======================================================================================================-->
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Platform.MaterialComponents.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:endIconMode="password_toggle"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginBottom="3dp"
+            android:hint="Password">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/passwordEt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="#1B5E20"
+                android:textSize="18sp"
+                tools:ignore="TouchTargetSizeCheck,TouchTargetSizeCheck" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!--=======================================================================================================-->
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="25dp"
+            android:layout_marginTop="85dp"
+            android:background="@drawable/shape_base_btn"
+            android:text="LOGIN"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/registerTextBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordEt" />
+
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/registerTextBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center"
+            android:text="you dont have account?  REGISTER →"
+            android:textColor="#1A237E"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
+
+
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

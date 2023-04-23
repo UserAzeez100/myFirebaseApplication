@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String uEmail=binding.emilEt.getText().toString();
+                String uEmail=binding.emailEt.getText().toString();
                 String uPassword=binding.passwordEt.getText().toString();
                 if (!uEmail.isEmpty()){
                     if (!uPassword.isEmpty()&&uPassword.length()>=6){
@@ -71,15 +71,16 @@ public class MainActivity extends AppCompatActivity {
                             }else{
                                 Toast.makeText(MainActivity.this, ""+ task.getException(), Toast.LENGTH_SHORT).show();
 
-                                auth.signOut();
-                                errorDialog();
+                            auth.signOut();
+                            errorDialog();
                             }
 
 
 
                         } else {
+                            auth.signOut();
+                            errorDialog();
                             // If sign up fails, display a message to the user
-
                             Toast.makeText(MainActivity.this, ""+ task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }

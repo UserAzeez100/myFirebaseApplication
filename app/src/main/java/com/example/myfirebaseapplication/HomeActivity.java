@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.example.myfirebaseapplication.databinding.ActivityHomeBinding;
 import com.example.myfirebaseapplication.fragments.FavoriteFragment;
@@ -39,9 +41,9 @@ public class HomeActivity extends AppCompatActivity {
 
 //        getSupportFragmentManager().beginTransaction().add(R.id.fragment_con2,new ViewFragment2()).commit();
         PagerAdapter adapter=new PagerAdapter(this);
-        adapter.addTapFragment(new TapFragmentClass("Prodect", ProdectFragment.newInstance("","")));
-        adapter.addTapFragment(new TapFragmentClass("Favorite", FavoriteFragment.newInstance("","")));
-        adapter.addTapFragment(new TapFragmentClass("Profile", ProfileFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("Products ✨", ProdectFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("Favorite ❤", FavoriteFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("Profile 🧑‍💻", ProfileFragment.newInstance("","")));
 
 
 
@@ -59,8 +61,6 @@ public class HomeActivity extends AppCompatActivity {
                 tab.setText(adapter.tapsArray.get(position).getTapName());
             }
         }).attach();
-
-        binding.viewPager2.setCurrentItem(0,false);
 
 
 

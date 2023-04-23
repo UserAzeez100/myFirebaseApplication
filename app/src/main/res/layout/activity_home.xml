@@ -30,15 +30,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/imageButton"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:layout_marginStart="15dp"
-        android:background="@drawable/back"
-        app:layout_constraintBottom_toBottomOf="@+id/screenTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <TextView-->
+<!--        android:id="@+id/imageButton"-->
+<!--        android:layout_width="22dp"-->
+<!--        android:layout_height="22dp"-->
+<!--        android:layout_marginStart="15dp"-->
+<!--        android:background="@drawable/back"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/screenTitle"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tap_layout"

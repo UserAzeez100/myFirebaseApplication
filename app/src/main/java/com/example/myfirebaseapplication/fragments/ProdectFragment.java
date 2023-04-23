@@ -74,6 +74,8 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     String pNameEt;
     String pDescriptionEt;
     ActivityResultLauncher launcher;
+    boolean isChecked=false;
+
 
 
     FirebaseStorage firebaseStorage;
@@ -156,7 +158,8 @@ public class ProdectFragment extends Fragment implements MyInterFace {
                              uriUpload = i.getData();
                             Glide.with(getActivity()).load(uriUpload).circleCrop().into(bottomSheetBinding.imageView);
                             imageString = uriUpload.toString();
-
+                            isChecked=true;
+                            Log.e("TAGia", "onActivityResult: "+imageString );
 
                         } else if (result.getResultCode() == RESULT_CANCELED) {
                             bottomSheetBinding.imageView.setImageResource(R.drawable.img);
@@ -199,27 +202,29 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
                 //  text input  validation:
                 if (!pNameEt.isEmpty() && !pDescriptionEt.isEmpty()) {
+                    if(uriUpload!=null) {
 
-                    prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
-                    prodectClass.setId(arrayList.size());
-                    prodectClass.setImageString(imageString);
+
+                        prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
+                        prodectClass.setId(arrayList.size());
+                        prodectClass.setImageString(imageString);
 
 //                    DateFormat dtForm = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss.");
 //                    String date = dtForm.format(Calendar.getInstance().getTime());
 //                    String fileName = date + FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                    uploadImageToFirebase(uriUpload, prodectClass.getId());//upload Image To Firebase:
-                    addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
-                    addToReciclerFunction(prodectClass);//add new item
+                        uploadImageToFirebase(uriUpload, prodectClass.getId());//upload Image To Firebase:
+                        addNewProdectToFirebaseStore(prodectClass);  //add to fire store:
+                        addToReciclerFunction(prodectClass);//add new item
 
 
-                    Log.e("imageId", "onClick: "+prodectClass.getId()+"===array:==="+arrayList.size() );
+                    }else Toast.makeText(getActivity(), "select Image ", Toast.LENGTH_SHORT).show();
+                } else  Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();
 
-                } else
-                    Toast.makeText(getActivity(), "enter the data ", Toast.LENGTH_SHORT).show();
             }
         });
         bottomSheetDialog.show();
+        bottomSheetBinding.pageTitle.setText("Add New Prodect");
 //        Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(bottomSheetBinding.imageView);
         bottomSheetBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,7 +241,7 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     }
 
     //bottom Sheet Edit product:
-    private void showBottomSheetDialog_edit(String name, String description, int imageName, int position) {
+    private void showBottomSheetDialog_edit(String name, String description, int imageName, int position,String myImageString) {
 
         if (bottomSheetDialog == null) {
 
@@ -250,28 +255,41 @@ public class ProdectFragment extends Fragment implements MyInterFace {
         bottomSheetBinding.newProdectNameEt.setText(name);
         bottomSheetBinding.newProdectDecriptionEt.setText(description);
 
+
+        Log.e("image", "showBottomSheetDialog_edit: |||"+arrayList.get(position).getImageString()+"|||" );
+
         bottomSheetBinding.saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 oldProdect = new ProdectClass(name, description);
+
 
                 pNameEt = bottomSheetBinding.newProdectNameEt.getText().toString();
                 pDescriptionEt = bottomSheetBinding.newProdectDecriptionEt.getText().toString();
 
                 //  text input  validation:
                 if (!pNameEt.isEmpty() && !pDescriptionEt.isEmpty()) {
+                    if (uriUpload!=null) {
+                        uploadImageToFirebase(uriUpload, imageName);//upload Image To Firebase:
+//
+                        prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
+                        prodectClass.setImageString(imageString);
+                        uriUpload = null;
+                    }else {
+//
+                        prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
+                        prodectClass.setImageString(myImageString);
 
-                    prodectClass = new ProdectClass(pNameEt, pDescriptionEt);
-                    prodectClass.setImageString(imageString);
+                        Log.e("empty", "onClick: |||"+arrayList.get(position).getImageString()+"||old:"+myImageString );
 
-                    uploadImageToFirebase(uriUpload, imageName);//upload Image To Firebase:
+                    }
+
                     updateDataInFirebase(oldProdect, mapFuc(prodectClass));////update data in fire store:
 
                     arrayList.get(position).setProdectName(prodectClass.getProdectName());
                     arrayList.get(position).setProdectDescription(prodectClass.getProdectDescription());
                     arrayList.get(position).setImageString(prodectClass.getImageString());
                     adapter.notifyItemChanged(position);
-
 
 
                     bottomSheetDialog.dismiss();
@@ -292,6 +310,7 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 //        bottomSheetBinding.newProdectNameEt.setText(name);
 //        bottomSheetBinding.newProdectDecriptionEt.setText(description);
         bottomSheetDialog.show();
+        bottomSheetBinding.pageTitle.setText("Edit Your Product");
         bottomSheetBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -371,6 +390,23 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
     }
 
+    private Map<String, Object> mapFuc(ProdectClass prodectClass) {
+        Map<String, Object> productMap = new HashMap<>();
+        productMap.put("prodectName", prodectClass.getProdectName());
+        productMap.put("prodectDescription", prodectClass.getProdectDescription());
+        productMap.put("favoriteBool", prodectClass.isFavoriteBool());
+//        if ()
+        productMap.put("imageString",prodectClass.getImageString());
+
+
+        Log.e("map", "mapFuc:imageString "+prodectClass.getImageString());
+//        productMap.put("productImage",productImage);
+
+//        updateDataInFirebase();
+        return productMap;
+    }
+
+
     //read all data from firebase Store:
     private void readAllDataFromFirebase() {
         db.collection("products")
@@ -407,28 +443,17 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     }
 
 
-    private Map<String, Object> mapFuc(ProdectClass prodectClass) {
-        Map<String, Object> productMap = new HashMap<>();
-        productMap.put("prodectName", prodectClass.getProdectName());
-        productMap.put("prodectDescription", prodectClass.getProdectDescription());
-        productMap.put("favoriteBool", prodectClass.isFavoriteBool());
 
-
-        Log.e("map", "mapFuc: " + prodectClass.getProdectDescription() + "/////" + prodectClass.getProdectName() + "/////");
-//        productMap.put("productImage",productImage);
-
-//        updateDataInFirebase();
-        return productMap;
-    }
-
-
-    @Override// when edit:::"
+    @Override// when Edit :::"
     public void getPositionInterface(int position) {
         int image = arrayList.get(position).getId();
+        String imageString =arrayList.get(position).getImageString();
         name = arrayList.get(position).getProdectName();
         description = arrayList.get(position).getProdectDescription();
 
-        showBottomSheetDialog_edit(name, description, image, position);
+        showBottomSheetDialog_edit(name, description, image, position,imageString);
+
+        Log.e(TAG, "getPositionInterface: imageString"+imageString );
 
 
 //        arrayList.set(position,prodectClass);
@@ -482,11 +507,15 @@ public class ProdectFragment extends Fragment implements MyInterFace {
 
         prodectClass = new ProdectClass(name, description);
 
+
         deleteImageFromFirebaseStorage(imageId);
         deleteFromFireStore(prodectClass);
         arrayList.remove(position);//delete item:
         adapter.getItemCount();
         adapter.notifyDataSetChanged();
+
+
+
 
 
 
@@ -570,6 +599,7 @@ public class ProdectFragment extends Fragment implements MyInterFace {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(getActivity(), "Image uploaded successfully", Toast.LENGTH_SHORT).show();
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -632,6 +662,8 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     public void onResume() {
         super.onResume();
         readAllDataFromFirebase();
+
+
     }
 
     @Override
@@ -644,9 +676,16 @@ public class ProdectFragment extends Fragment implements MyInterFace {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        for (int i = 0; i <= arrayList.size(); i++) {
-            retrieveImageFromFireStore(i);
-        }
+
+        //TODO:here we have one question??!////////////////////////////////////////////////
+//        for (int i = 0; i <=arrayList.size(); i++) {
+//            int imageId=   arrayList.get(i).getId();
+//            retrieveImageFromFireStore(imageId);
+//            Log.e("imageLoop", "onViewCreated: "+"("+i+")"+imageId+( arrayList.size()) );
+//
+//        }
+        ///////////////////////////////////////////////
+
     }
 }
 

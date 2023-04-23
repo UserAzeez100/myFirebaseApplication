@@ -28,7 +28,7 @@
 
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_page_title"
+                android:id="@+id/pageTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -55,6 +55,8 @@
             <!--=======================================================================================================-->
 
             <com.google.android.material.textfield.TextInputLayout
+                app:endIconMode="clear_text"
+
 
                 style="@style/Platform.MaterialComponents.Light"
                 android:layout_width="match_parent"
@@ -76,6 +78,8 @@
             <!--=======================================================================================================-->
 
             <com.google.android.material.textfield.TextInputLayout
+                app:endIconMode="clear_text"
+
                 style="@style/Platform.MaterialComponents.Light"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -1,7 +1,6 @@
 package com.example.myfirebaseapplication;
 
 import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -11,19 +10,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.developer.kalert.KAlertDialog;
+import com.example.myfirebaseapplication.other.UserData;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -31,14 +32,23 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
-
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class RegisterActivity extends AppCompatActivity {
+
+
     com.example.myfirebaseapplication.databinding.ActivityRegisterBinding binding;
     GoogleSignInAccount googleAccount;
+    FirebaseFirestore db;
+    FirebaseUser firebaseUser;
+    CollectionReference usersCollectionRef;
+    UserData userData;
+
+
+
 
     private ActivityResultLauncher<Intent> mStartForResultLauncher;
 
@@ -48,12 +58,18 @@ public class RegisterActivity extends AppCompatActivity {
         binding = com.example.myfirebaseapplication.databinding.ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        db = FirebaseFirestore.getInstance();
+        usersCollectionRef = db.collection("profileData");
+        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
+
+
         //back to login
         binding.loginTextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                 startActivity(intent);
+
             }
         });
         //when you click phone icon:
@@ -61,7 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                binding.passwordEt.setHint("enter your phone :_ _ _ _ _ _ _")
-//                binding.passwordEt.setInputType(InputType.TYPE_CLASS_PHONE);
+                binding.passwordEt.setInputType(InputType.TYPE_CLASS_PHONE);
                 binding.phoneEt.setVisibility(View.VISIBLE);
                 binding.passwordEt.setVisibility(View.GONE);
                 binding.emilEt.setVisibility(View.GONE);
@@ -84,13 +100,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
         //validation the edite texts:
         binding.registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +116,8 @@ public class RegisterActivity extends AppCompatActivity {
                         if (!passwordU.isEmpty() && passwordU.length() >= 6) {
                             if (!countryU.isEmpty()){
 
+                                 userData=new UserData("1",nameU,countryU,"no value",emailU);
+                                addNewUserToFirebaseStore(userData);//add to fire store user data
                             //sign Up by email ::
                             signUpWithEmail(emailU, passwordU);
 
@@ -120,7 +131,10 @@ public class RegisterActivity extends AppCompatActivity {
                    Toast.makeText(RegisterActivity.this, "you cant keep the name empty ", Toast.LENGTH_SHORT).show();
 
                 }else  if (!nameU.isEmpty()||!countryU.isEmpty()){
-                    if (!phoneU.isEmpty()||phoneU.length() > 12){
+                    if (!phoneU.isEmpty()&&phoneU.length() >= 6 && phoneU.length() <= 14 ){
+
+                         userData=new UserData("1",nameU,countryU,phoneU,"no value");
+                        addNewUserToFirebaseStore(userData);//add to fire store user data
 
                         Intent intent = new Intent(RegisterActivity.this, VerificationActivity.class);
                         intent.putExtra("phone",phoneU);
@@ -149,7 +163,8 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 googleSignInIntoMyApp();
-
+//                    userData = new UserData("1", "", "", "","security email");
+//                    addNewUserToFirebaseStore(userData);//add to fire store user data
             }
         });
 
@@ -199,7 +214,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
                 } else {
-                    // If sign up fails, display a message to the user
+                    // If sign up fails
                     Toast.makeText(RegisterActivity.this, "Sign up failed", Toast.LENGTH_SHORT).show();
                     auth.signOut();
                 }
@@ -209,7 +224,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     //alert dialog success massage:
     void successDialog() {
-        new KAlertDialog(this, KAlertDialog.SUCCESS_TYPE).setTitleText("Good job!").setContentText("You created a new account successfully").setConfirmClickListener("OK", new KAlertDialog.KAlertClickListener() {
+        new KAlertDialog(this, KAlertDialog.SUCCESS_TYPE).setTitleText("Good job!")
+                .setContentText("You created a new account successfully").
+                setConfirmClickListener("OK", new KAlertDialog.KAlertClickListener() {
             @Override
             public void onClick(KAlertDialog kAlertDialog) {
                 kAlertDialog.dismissWithAnimation();
@@ -238,7 +255,8 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.d(TAG, "signInWithCredential:success");
             } else {
                 // If sign in fails:
-                Toast.makeText(this, "bad", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, ""+task.getException(), Toast.LENGTH_SHORT).show();
+
                 Log.d(TAG, "signInWithCredential:failure", task.getException());
             }
         });
@@ -254,7 +272,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         } catch (ApiException e) {
-            // Google Sign-In failed, update UI appropriately
+            // Google Sign-In failed
             Log.w(TAG, "Google sign in failed", e);
         }
     }
@@ -268,5 +286,24 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
+    // add New Prodect To Firebase Store function:
+    private void addNewUserToFirebaseStore(UserData userData) {
+        db.collection("profileData")
+                .add(userData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(getBaseContext(), "the data added successfully ", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getBaseContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "Error adding document", e);
+                    }
+                });
 
+
+    }
 }

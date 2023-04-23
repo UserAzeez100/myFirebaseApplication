@@ -7,12 +7,13 @@
     tools:context=".VerificationActivity">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/tv_resend_code"
+        android:id="@+id/ResendTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="23dp"
-        android:text="resendb code"
+        android:layout_marginTop="18dp"
+        android:text="Resend code"
         android:textAllCaps="false"
+        android:textColor="#1D5958"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +60,7 @@
         android:textStyle="bold"
         android:textColor="#784646"
         android:textSize="23sp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="60dp"
         android:text="enter verification code"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -79,13 +80,13 @@
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/verificationEt"
+        android:id="@+id/verificationLayout"
         style="@style/Platform.MaterialComponents.Light"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="45dp"
         android:layout_marginBottom="1dp"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="120dp"
         android:hint="___  ___  ___  ___"
         app:layout_constraintBottom_toTopOf="@+id/base_btn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -108,13 +109,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="120dp"
+        android:layout_marginTop="80dp"
         android:background="@drawable/shape_base_btn"
         android:text="Enter"
-        android:layout_marginTop="80dp"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/verificationEt" />
+        app:layout_constraintTop_toBottomOf="@+id/verificationLayout" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
