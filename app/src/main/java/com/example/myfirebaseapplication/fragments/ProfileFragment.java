@@ -246,7 +246,7 @@ public class ProfileFragment extends Fragment {
     void errorDialog() {
 
         new KAlertDialog(getActivity(), KAlertDialog.WARNING_TYPE)
-                .setTitleText("Are you sure")
+                .setTitleText("-- Are you sure --")
                 .setContentText("you want to sign out ‼")
                 .setConfirmClickListener("Yes", new KAlertDialog.KAlertClickListener() {
                     @Override
@@ -269,12 +269,12 @@ public class ProfileFragment extends Fragment {
                         }
 
                     }
-                }).setCancelClickListener("Cancel", new KAlertDialog.KAlertClickListener() {
+                }).setCancelClickListener("Cancel",R.color.gold, new KAlertDialog.KAlertClickListener() {
                     @Override
                     public void onClick(KAlertDialog kAlertDialog) {
                         kAlertDialog.dismissWithAnimation();
                     }
-                }).confirmButtonColor(R.color.blue)
+                }).cancelButtonColor(R.drawable.shape_yes_or_no_btn).confirmButtonColor(R.drawable.shape_base_btn)
                 .show();
     }
 
@@ -291,11 +291,13 @@ public class ProfileFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 userData = document.toObject(UserData.class);
 
-                                binding.clintNameEt.setText(firebaseAuth.getDisplayName());
-                                binding.clintNameTv.setText("M."+ firebaseAuth.getDisplayName());
+                                binding.clintNameEt.setText(userData.getName());
+                                binding.clintNameTv.setText("M."+ userData.getName());
                                 binding.clintcuontyEt.setText(userData.getCountry());
                                 if (firebaseAuth.isEmailVerified()){
                                        binding.clintEmailTv.setText(firebaseAuth.getEmail());
+                                       binding.clintNameEt.setText(firebaseAuth.getDisplayName());
+                                       binding.clintNameTv.setText("M."+ firebaseAuth.getDisplayName());
 
                                 }else
                                     binding.clintEmailTv.setText(firebaseAuth.getPhoneNumber());

@@ -116,12 +116,16 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
 
     @Override
     public void heartPosition(int position, Boolean status) {
-        arrayListFavorite.get(position).setFavoriteBool(status);
-        int id =arrayListFavorite.get(position).getId();
-        updateDataInFirebaseF(status,id);
-        arrayListFavorite.remove(position);
-        adapter.getItemCount();
-        adapter.notifyDataSetChanged();
+        if (!arrayListFavorite.isEmpty()) {
+            arrayListFavorite.get(position).setFavoriteBool(status);
+           int id =arrayListFavorite.get(position).getId();
+            updateDataInFirebaseF(status,id);
+            arrayListFavorite.remove(position);
+            adapter.getItemCount();
+            adapter.notifyDataSetChanged();
+
+        }
+        
 
 
 
