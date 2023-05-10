@@ -12,5 +12,8 @@
 
 
     <color name="gray">#959595</color>
+    <color name="white20">#1DFFFFFF</color>
+    <color name="blue500">#1A237E</color>
+    <color name="blue800">#080F57</color>
 
 </resources>

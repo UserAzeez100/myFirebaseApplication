@@ -23,7 +23,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -42,11 +45,14 @@ import java.util.Map;
 public class FavoriteFragment extends Fragment implements MyInterFace {
 
     FragmentFavoriteBinding binding;
-    ArrayList<ProdectClass> arrayListFavorite=new ArrayList<>();
+    ArrayList<ProdectClass> arrayListFavorite = new ArrayList<>();
     RecyclerProductsAdapter adapter;
     FirebaseFirestore db;
     CollectionReference usersCollectionRef;
     ProdectClass prodect;
+    DocumentReference documentReferenceUser;
+    CollectionReference userCollection;
+    FirebaseUser firebaseUser;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -97,7 +103,11 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
         // Inflate the layout for this fragment
         binding = FragmentFavoriteBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         usersCollectionRef = db.collection("products");
+        userCollection = db.collection("profileData");
+        documentReferenceUser = db.collection("profileData").document(firebaseUser.getUid()).collection("userArrayListProducts").getParent();
+
 
         return binding.getRoot();
     }
@@ -118,18 +128,13 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
     public void heartPosition(int position, Boolean status) {
         if (!arrayListFavorite.isEmpty()) {
             arrayListFavorite.get(position).setFavoriteBool(status);
-           int id =arrayListFavorite.get(position).getId();
-            updateDataInFirebaseF(status,id);
+            String id = arrayListFavorite.get(position).getId();
+            updateDataInFirebaseF(status, id);
             arrayListFavorite.remove(position);
             adapter.getItemCount();
             adapter.notifyDataSetChanged();
 
         }
-        
-
-
-
-
 
 
     }
@@ -148,26 +153,26 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
 
     //read all data from firebase Store:
     private void readAllDataFromFirebase() {
-        db.collection("products").whereEqualTo("favoriteBool",true)
+        db.collection("profileData").document(firebaseUser.getUid()).collection("userArrayListProducts").
+                whereEqualTo("favoriteBool", true)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         if (task.isSuccessful()) {
-                            int i=0;
+                            int i = 0;
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 ++i;
-                               prodect = document.toObject(ProdectClass.class);
-                                Log.e("jjjjjjj", "onComplete: "+i);
-                                Log.e("jjjjjjj", "onComplete: "+i+ prodect.isFavoriteBool()+"****"+arrayListFavorite.size());
+                                prodect = document.toObject(ProdectClass.class);
+
+                                Log.e("jjjjjjj", "onComplete: " + i + prodect.isFavoriteBool() + "****" + arrayListFavorite.size());
 
                                 if (prodect.isFavoriteBool()) {
                                     binding.textLable.setVisibility(View.INVISIBLE);
                                     addToRecyclerFunction(prodect);//"we handle the data here in recycler"
 
                                 }
-
                             }
                         } else {
                             Log.w(TAG, "Error_ada", task.getException());
@@ -182,56 +187,54 @@ public class FavoriteFragment extends Fragment implements MyInterFace {
     //"we handling the data here in recycler"
     private void addToRecyclerFunction(ProdectClass prodectClass) {
         arrayListFavorite.add(prodectClass);
-        adapter = new RecyclerProductsAdapter(arrayListFavorite,this);
+        adapter = new RecyclerProductsAdapter(arrayListFavorite, this);
         binding.rectangleContaner.setAdapter(adapter);
         binding.rectangleContaner.setLayoutManager(new LinearLayoutManager(getActivity(),
                 RecyclerView.VERTICAL, false));
-        adapter.notifyItemChanged(arrayListFavorite.size()-1);
-
+        adapter.notifyItemChanged(arrayListFavorite.size() - 1);
 
 
     }
 
 
-    private void updateDataInFirebaseF(boolean b, int id) {
+    private void updateDataInFirebaseF(boolean b, String id) {
         Map<String, Boolean> productMap = new HashMap<>();
         productMap.put("favoriteBool", b);
-        usersCollectionRef.whereEqualTo("id", id).
+        userCollection.document(firebaseUser.getUid()).collection("userArrayListProducts").
+                whereEqualTo("id", id).
                 get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (!task.getResult().getDocuments().isEmpty()) {
-                                for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                                    usersCollectionRef.document(document.getId()).
-                                            set((productMap), SetOptions.merge())
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        for (int i = 0; i < querySnapshot.size(); i++) {
+                            if (querySnapshot.size() > 0) {
+                                // Get the document reference of the first matching document
+                                DocumentReference documentReference = querySnapshot.getDocuments().get(i).getReference();
 
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
+                                // Update the document using the document reference
+                                documentReference.set(productMap, SetOptions.merge())
+
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
 //                                                    readAllDataFromFirebase();
-                                                    Toast.makeText(getActivity(), "fav updated successfully", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "fav updated successfully", Toast.LENGTH_SHORT).show();
 
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.e("eroooor", "onFailure: " + e);
-                                                    Toast.makeText(getActivity(), "Error updating fav" + e, Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e("eroooor", "onFailure: " + e);
+                                                Toast.makeText(getActivity(), "Error updating fav" + e, Toast.LENGTH_SHORT).show();
 
-                                                }
-                                            });
-                                }
-                            }
-
-                        } else {
-
-                            Log.e(TAG, "Error getting fav.", task.getException());
-                            Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }else  Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
 
                         }
+
+
                     }
                 });
 

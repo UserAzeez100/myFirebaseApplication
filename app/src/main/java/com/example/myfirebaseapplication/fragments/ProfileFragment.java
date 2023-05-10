@@ -7,7 +7,6 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -64,6 +63,7 @@ public class ProfileFragment extends Fragment {
     CollectionReference usersCollectionRef;
     UserData userData;
     FirebaseUser firebaseAuth;
+    Uri uriImage;
 
     StorageReference storageRef;
 
@@ -114,43 +114,15 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentProfileBinding.inflate(inflater, container, false);
         firebaseStorage = FirebaseStorage.getInstance();
+        userData = new UserData();
 
 
         db = FirebaseFirestore.getInstance();
         usersCollectionRef = db.collection("profileData");
-         firebaseAuth =FirebaseAuth.getInstance().getCurrentUser();
+        firebaseAuth = FirebaseAuth.getInstance().getCurrentUser();
+
         readAllDataFromFirebase();
 
-
-
-        binding.EditeProfileBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                String country = binding.clintcuontyEt.getText().toString();
-                String name = binding.clintNameEt.getText().toString();
-
-                if (!country.isEmpty() && !name.isEmpty()) {
-                    userData.setName(name);
-                    userData.setCountry(country);
-                    Log.e(TAG, "onClick: " + name + "country:" + country + "////old///");
-
-                    updateDataInFirebase( userData);
-
-                } else
-                    Toast.makeText(getActivity(), "you cant send empty data ", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-
-        binding.logeOutTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                errorDialog();
-            }
-        });
 
         ActivityResultLauncher launcher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -160,14 +132,15 @@ public class ProfileFragment extends Fragment {
 
                         if (result.getResultCode() == RESULT_OK) {
                             Intent i = result.getData();
-                            Uri b = i.getData();
-                            Glide.with(getActivity()).load(b).circleCrop().into(binding.imageViewProfile);
-                            uploadImageToFirebase(b, "azeezImage");//upload Image To Firebase:
+                             uriImage = i.getData();
+                            Glide.with(getActivity()).load(uriImage).circleCrop().into(binding.imageViewProfile);
+                            uploadImageToFirebase(uriImage, "ImageName" + firebaseAuth.getUid());//upload Image To Firebase:
+                            Toast.makeText(getActivity(), "click Edite button", Toast.LENGTH_SHORT).show();
 
 
                         } else if (result.getResultCode() == RESULT_CANCELED) {
 //                            binding.imageViewProfile.setImageResource(R.drawable.img);
-                            retrieveImageFromFireStore("azeezImage");
+                            retrieveImageFromFireStore("ImageName"+firebaseAuth.getUid());
                         }
                     }
                 }
@@ -185,6 +158,40 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+
+
+        binding.EditeProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String country = binding.clintcuontyEt.getText().toString();
+                String name = binding.clintNameEt.getText().toString();
+
+                if (!country.isEmpty() && !name.isEmpty()) {
+                    userData.setName(name);
+                    userData.setCountry(country);
+                    if (uriImage!=null) {
+                        userData.setImage(uriImage.toString());
+                    }
+
+                    Log.e(TAG, "onClick: " + name + "country:" + country + "////old///");
+
+                    updateDataInFirebase(userData);
+
+                } else
+                    Toast.makeText(getActivity(), "you cant send empty data ", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
+        binding.logeOutTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                errorDialog();
+            }
+        });
 
         return binding.getRoot();
     }
@@ -222,7 +229,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.e("TAG", "onFailure:image download!! ");
-                Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(binding.imageViewProfile);
+                Glide.with(getActivity()).load(R.drawable.avtar).circleCrop().into(binding.imageViewProfile);
 
 
             }
@@ -232,14 +239,15 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        retrieveImageFromFireStore("azeezImage");
+        retrieveImageFromFireStore("ImageName"+firebaseAuth.getUid());
 
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        retrieveImageFromFireStore("azeezImage");
+        retrieveImageFromFireStore("ImageName"+firebaseAuth.getUid());
+
     }
 
     //errorDialog for sign out:
@@ -260,7 +268,7 @@ public class ProfileFragment extends Fragment {
                             Intent intent = new Intent(getActivity(), MainActivity.class);
                             startActivity(intent);
 
-                            Log.e("account", "onClick: "+ firebaseAuth);
+                            Log.e("account", "onClick: " + firebaseAuth);
                             Toast.makeText(getActivity(), "You signed out successfully" + firebaseAuth, Toast.LENGTH_SHORT).show();
 
                         } else {
@@ -269,7 +277,7 @@ public class ProfileFragment extends Fragment {
                         }
 
                     }
-                }).setCancelClickListener("Cancel",R.color.gold, new KAlertDialog.KAlertClickListener() {
+                }).setCancelClickListener("Cancel", R.color.gold, new KAlertDialog.KAlertClickListener() {
                     @Override
                     public void onClick(KAlertDialog kAlertDialog) {
                         kAlertDialog.dismissWithAnimation();
@@ -290,20 +298,25 @@ public class ProfileFragment extends Fragment {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 userData = document.toObject(UserData.class);
+                                Log.e("firebaseAuth_id", "onComplete:idUser( )" + document.getId());
+                                Log.e("firebaseAuth_id", "onComplete:idUser( auth--:)" + firebaseAuth.getUid());
+                                Log.e("firebaseAuth_id", "onComplete:idUser( userId--:)" + userData.getId());
 
-                                binding.clintNameEt.setText(userData.getName());
-                                binding.clintNameTv.setText("M."+ userData.getName());
-                                binding.clintcuontyEt.setText(userData.getCountry());
-                                if (firebaseAuth.isEmailVerified()){
-                                       binding.clintEmailTv.setText(firebaseAuth.getEmail());
-                                       binding.clintNameEt.setText(firebaseAuth.getDisplayName());
-                                       binding.clintNameTv.setText("M."+ firebaseAuth.getDisplayName());
+                                if (userData.getId() != null && userData.getId().equals(firebaseAuth.getUid())) {
+                                    binding.clintNameEt.setText(userData.getName());
+                                    binding.clintNameTv.setText(getString(R.string.M)+ userData.getName());
+                                    binding.clintcuontyEt.setText(userData.getCountry());
+                                    retrieveImageFromFireStore(userData.getImageName());
+                                    if (firebaseAuth.isEmailVerified()) {
+                                        binding.clintEmailTv.setText(firebaseAuth.getEmail());
+                                    } else
+                                        binding.clintEmailTv.setText(firebaseAuth.getPhoneNumber());
 
-                                }else
-                                    binding.clintEmailTv.setText(firebaseAuth.getPhoneNumber());
+                                } else
+                                    Log.e(TAG, "onComplete: UI error");
+
+
                             }
-                        } else {
-                            Log.w(TAG, "Error_read:", task.getException());
                         }
                     }
                 });
@@ -313,13 +326,14 @@ public class ProfileFragment extends Fragment {
 
 
     //update user data in fire store ::
-    private void updateDataInFirebase( UserData newData) {
+    private void updateDataInFirebase(UserData newData) {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("name", newData.getName());
         userMap.put("country", newData.getCountry());
+        userMap.put("image", newData.getImage());
 //                whereEqualTo("country",  oldData.getCountry())
         usersCollectionRef.
-                whereEqualTo("id","1")
+                whereEqualTo("id", firebaseAuth.getUid())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -356,6 +370,7 @@ public class ProfileFragment extends Fragment {
                             Toast.makeText(getActivity(), "Error getting up document", Toast.LENGTH_SHORT).show();
 
                         }
+
                     }
                 });
 

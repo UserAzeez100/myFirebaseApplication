@@ -1,17 +1,37 @@
 package com.example.myfirebaseapplication.other;
 
-public class UserData {
-    private String id,name,country,image,phone,email;
+import java.util.ArrayList;
 
-    public UserData(String id, String name, String country, String phone ,String email) {
+public class UserData {
+    private String id,name,country,image,phone,email,imageName;
+    private ArrayList<ProdectClass> userArrayListProducts =new ArrayList<>();
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public UserData(String id, String name, String country, String phone , String email) {
         this.id = id;
         this.name = name;
         this.country = country;
         this.phone = phone;
         this.email = email;
+
     }
 
     public UserData() {
+    }
+
+    public ArrayList<ProdectClass> getUserArrayListProducts() {
+        return userArrayListProducts;
+    }
+
+    public void setUserArrayListProducts(ArrayList<ProdectClass> userArrayListProducts) {
+        this.userArrayListProducts = userArrayListProducts;
     }
 
     public String getEmail() {

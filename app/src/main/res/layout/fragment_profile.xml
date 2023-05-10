@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,12 +7,6 @@
     android:background="#68E8E9EC"
     tools:context=".fragments.ProfileFragment">
 
-
-
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,7 +39,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginTop="90dp"
-            android:text="🧑‍💻 M.Ahmad Taweel"
+            android:text="@string/M"
             android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -89,7 +83,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginBottom="10dp"
-                android:hint="Clint Name">
+                android:hint="@string/clint_name">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/clintNameEt"
@@ -111,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginBottom="3dp"
-                android:hint="Clint Country">
+                android:hint="@string/clint_country">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/clintcuontyEt"
@@ -134,7 +128,7 @@
                 android:layout_marginTop="43dp"
                 android:layout_marginBottom="5dp"
                 android:background="@drawable/shape_base_btn"
-                android:text="Edite Profile"
+                android:text="@string/edite_profile"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="17sp"
@@ -154,7 +148,7 @@
             android:background="@drawable/log_out_shape"
             style="@style/MyTextViewStyle"
             android:gravity="center"
-            android:text="‍💻 Log Out ‍💻 "
+            android:text="@string/log_out"
             android:textColor="#0779DD"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -170,4 +164,3 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
-</FrameLayout>

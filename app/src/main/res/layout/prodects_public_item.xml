@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="130dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="10dp"
+        android:elevation="10dp"
+        app:cardCornerRadius="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!--=======================================================================================================-->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgProductPhoto"
+                android:layout_width="90dp"
+                android:layout_height="70dp"
+                android:layout_margin="6dp"
+                android:background="@color/white"
+                android:src="@drawable/img"
+                android:textDirection="locale"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!--=======================================================================================================-->
+
+            <!--=======================================================================================================-->
+
+            <!--=======================================================================================================-->
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/productNameTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/td"
+                android:layout_marginStart="5dp"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textDirection="locale"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/pNameTv"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/prodectDescriptionTv"
+                android:layout_width="107dp"
+                android:layout_height="26dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/t_de"
+                android:textAllCaps="false"
+                android:textDirection="locale"
+                android:gravity="center_vertical"
+                android:textSize="15sp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/pDescriptionTv"
+                app:layout_constraintTop_toBottomOf="@+id/productNameTv" />
+
+            <TextView
+                android:id="@+id/pNameTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/text_shape"
+                android:padding="3dp"
+                android:text="@string/product_name"
+                android:textColor="#004D40"
+                android:textDirection="locale"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@+id/productNameTv"
+                app:layout_constraintStart_toEndOf="@+id/imgProductPhoto"
+                app:layout_constraintTop_toTopOf="@+id/productNameTv" />
+
+            <TextView
+                android:id="@+id/pDescriptionTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="7dp"
+                android:background="@drawable/text_shape"
+                android:padding="3dp"
+                android:text="@string/description"
+                android:textColor="#004D40"
+                android:textDirection="locale"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="@+id/prodectDescriptionTv"
+                app:layout_constraintStart_toEndOf="@+id/imgProductPhoto"
+                app:layout_constraintTop_toTopOf="@+id/prodectDescriptionTv"
+                app:layout_constraintVertical_bias="1.0" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

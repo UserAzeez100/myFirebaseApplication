@@ -16,6 +16,7 @@ import com.example.myfirebaseapplication.databinding.ActivityHomeBinding;
 import com.example.myfirebaseapplication.fragments.FavoriteFragment;
 import com.example.myfirebaseapplication.fragments.ProdectFragment;
 import com.example.myfirebaseapplication.fragments.ProfileFragment;
+import com.example.myfirebaseapplication.fragments.UserProductsFragment;
 import com.example.myfirebaseapplication.other.PagerAdapter;
 import com.example.myfirebaseapplication.other.ProdectClass;
 import com.example.myfirebaseapplication.other.TapFragmentClass;
@@ -41,9 +42,12 @@ public class HomeActivity extends AppCompatActivity {
 
 //        getSupportFragmentManager().beginTransaction().add(R.id.fragment_con2,new ViewFragment2()).commit();
         PagerAdapter adapter=new PagerAdapter(this);
-        adapter.addTapFragment(new TapFragmentClass("Products ✨", ProdectFragment.newInstance("","")));
-        adapter.addTapFragment(new TapFragmentClass("Favorite ❤", FavoriteFragment.newInstance("","")));
-        adapter.addTapFragment(new TapFragmentClass("Profile 🧑‍💻", ProfileFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("my products", UserProductsFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("❤", FavoriteFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("🧑‍💻", ProfileFragment.newInstance("","")));
+        adapter.addTapFragment(new TapFragmentClass("Products", ProdectFragment.newInstance("","")));
+
+
 
 
 

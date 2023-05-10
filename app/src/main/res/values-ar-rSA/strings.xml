@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My firebase Application</string>
+    <string name="Password">كلمة السر</string>
+    <string name="email">البريد الالكتروني</string>
+    <string name="login">تسجيل دخول</string>
+    <string name="you_dont_have_account">ليس لديك حساب؟</string>
+    <string name="register">"انشاء حساب "</string>
+    <string name="or">"أو  "</string>
+    <string name="logIn_with">"سجل عن طريق "</string>
+    <string name="register_titele">"انشاء حساب "</string>
+    <string name="enter_your_name">ادخل اسمك</string>
+    <string name="enter_your_country">ادخل مدينتك</string>
+    <string name="enter_your_email">ادخل البريد الالكتروني</string>
+    <string name="enter_your_password">"ادخل كلمة السر "</string>
+    <string name="you_have_account">لديك  حساب مسبق؟ا</string>
+    <string name="login_as_guest">سجل ك زائر</string>
+    <string name="product_name">اسم المنتج:</string>
+    <string name="description">الوصف:</string>
+    <string name="M">🧑‍💻أ.</string>
+    <string name="clint_name">اسم المستخدم</string>
+    <string name="clint_country">الدولة</string>
+    <string name="edite_profile">تعديل الملف الشخصي</string>
+    <string name="log_out">تسجيل خروج 📴</string>
+    <string name="home">شاشة البداية</string>
+</resources>
