@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">My firebase Application</string>
-    <string name="wep_client" translatable="false"> 747874154449-3715k08kci7ovj4reqdphhhf6e8h88hn.apps.googleusercontent.com</string>
+    <string name="wep_client" translatable="false">179423306320-6ass5h9d3fp4cf910r5d4b2fn2qgqsfr.apps.googleusercontent.com</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="Password">Password</string>
@@ -8,7 +8,7 @@
     <string name="login">Login</string>
     <string name="you_dont_have_account">you dont have account?</string>
     <string name="register">register</string>
-    <string name="or">OR</string>
+    <string name="or">OR</string>i
     <string name="logIn_with">logIn with</string>
     <string name="register_titele">Register</string>
     <string name="enter_your_name">enter your name</string>
@@ -30,5 +30,12 @@
     <string name="phone_number">enter your phone Number</string>
     <string name="dont_have_phone_accuont">\"You don\'t have phone account \"</string>
     <string name="enter_your_phone">enter your phone</string>
+    <string name="login_with_email">login with email</string>
+    <string name="login_with_phone">login with phone</string>
+    <string name="login_with_Facebook">login with Facebook</string>
+    <string name="register_with_email">register with email</string>
+    <string name="register_with_phone">register with phone</string>
+    <string name="register_with_Facebook">register with Facebook</string>
+    <string name="register_with_google">register with google</string>
 
 </resources>

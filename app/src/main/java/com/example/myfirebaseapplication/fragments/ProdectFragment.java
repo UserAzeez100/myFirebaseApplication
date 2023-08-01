@@ -227,14 +227,7 @@ public class ProdectFragment extends Fragment implements MyInterFace  {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //TODO:here we have one question??!////////////////////////////////////////////////
-//        for (int i = 0; i <=arrayList.size(); i++) {
-//            int imageId=   arrayList.get(i).getId();
-//            retrieveImageFromFireStore(imageId);
-//            Log.e("imageLoop", "onViewCreated: "+"("+i+")"+imageId+( arrayList.size()) );
-//
-//        }
-        ///////////////////////////////////////////////
+
 
     }
 }

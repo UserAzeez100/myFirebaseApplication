@@ -1,5 +1,7 @@
 package com.example.myfirebaseapplication.other;
 
+import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.myfirebaseapplication.R;
 import com.example.myfirebaseapplication.databinding.ProdectItemBinding;
 import com.example.myfirebaseapplication.databinding.ProdectsPublicItemBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -56,11 +63,8 @@ public class RecyclerProductsPuplicAdapter extends RecyclerView.Adapter<Recycler
         });
 
 
-        String imageUrl = prodectArrayList.get(position).getImageString();
-
-            Glide.with(holder.itemView)
-                    .load(imageUrl).circleCrop()
-                    .into(holder.imgProductPhoto);
+        String imageName = prodectArrayList.get(position).getId();
+        retrieveImageFromFireStore(imageName,holder);
 
 
     }
@@ -95,6 +99,31 @@ public class RecyclerProductsPuplicAdapter extends RecyclerView.Adapter<Recycler
     }
 
 
+    //retrieve Image From FireStore:
+    private void retrieveImageFromFireStore(String imageName,@NonNull ProdectViweHolder holder) {
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+
+
+        StorageReference storageRef = firebaseStorage.getReference().child("productsImage/" + imageName);
+        storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(holder.itemView)
+                        .load(uri).circleCrop()
+                        .into(holder.imgProductPhoto);
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("TAG", "onFailure:image download!! ");
+                Glide.with(holder.itemView).load(R.drawable.avtar).circleCrop().into(holder.imgProductPhoto);
+
+
+            }
+        });
+    }
 
 
 }

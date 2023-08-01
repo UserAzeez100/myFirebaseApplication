@@ -20,13 +20,15 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
+            android:elevation="4dp"
+            android:padding="5dp"
             android:layout_height="match_parent">
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/deleteIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="17dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="10dp"
                 android:background="@drawable/delete_selector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/editIcon"
@@ -35,14 +37,14 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/editIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="52dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="10dp"
                 android:background="@color/white"
 
                 android:src="@drawable/edit_icon"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/heartIcon"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -51,7 +53,7 @@
                 android:layout_height="70dp"
                 android:layout_margin="6dp"
                 android:background="@color/white"
-                android:src="@drawable/img"
+                android:src="@drawable/avtar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -90,8 +92,8 @@
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/heartIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginEnd="10dp"
                 android:button="@drawable/heart_selector"
                 app:layout_constraintBottom_toBottomOf="parent"

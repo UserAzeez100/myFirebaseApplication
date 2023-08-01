@@ -214,7 +214,7 @@ public class VerificationActivity extends AppCompatActivity {
                                     String message = "Somthing is wrong, we will fix it soon...";
 
                                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                        message = "Invalid code entered...";
+                                        message = task.getException()+"";
                                     }
 
                                     Toast.makeText(VerificationActivity.this, message, Toast.LENGTH_SHORT).show();

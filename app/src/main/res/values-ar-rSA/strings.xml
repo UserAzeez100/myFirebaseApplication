@@ -23,4 +23,14 @@
     <string name="edite_profile">تعديل الملف الشخصي</string>
     <string name="log_out">تسجيل خروج 📴</string>
     <string name="home">شاشة البداية</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="dont_have_phone_accuont">ليس لديك حساب برقم الهاتف</string>
+    <string name="enter_your_phone">ادخل رقم هاتفك</string>
+    <string name="login_with_email">سجل بواسطة Gmail</string>
+    <string name="login_with_phone">سجل بواسطة رقم هاتفك</string>
+    <string name="login_with_Facebook">سجل بواسطة Facebook</string>
+    <string name="register_with_email">سجل بواسطة Gmail</string>
+    <string name="register_with_phone">سجل بواسطة رقم هاتفك</string>
+    <string name="register_with_Facebook">سجل بواسطة Facebook</string>
+    <string name="register_with_google">سجل بواسطة Google</string>
 </resources>

@@ -84,6 +84,8 @@
                 android:layout_height="48dp"
                 android:backgroundTint="@color/white"
                 android:inputType="textEmailAddress"
+                android:drawableStart="@drawable/email_icon"
+                android:drawablePadding="10dp"
                 android:outlineAmbientShadowColor="@color/white"
                 android:padding="6dp"
                 android:textColor="@color/black"
@@ -117,6 +119,8 @@
                 android:backgroundTint="@color/white"
                 android:outlineAmbientShadowColor="@color/white"
                 android:padding="6dp"
+                android:drawableStart="@drawable/password_icon"
+                android:drawablePadding="10dp"
                 android:textColor="@color/black"
                 android:textSize="15sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -202,10 +206,12 @@
 
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="50dp"
             android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
 
@@ -213,40 +219,41 @@
                 android:id="@+id/signInGoogle"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginHorizontal="25dp"
-                android:background="@drawable/google"
+                android:layout_marginHorizontal="10dp"
+                android:background="@drawable/google_icon"
                 android:padding="3dp"
-                android:tooltipText="Click this icon to register with google"
+                android:tooltipText="login with google"
                 tools:ignore="SpeakableTextPresentCheck" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/signInFacebook"
-                android:layout_width="22dp"
+                android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginHorizontal="25dp"
-                android:background="@drawable/facebook_icon"
+                android:layout_marginHorizontal="10dp"
                 android:padding="3dp"
-                android:tooltipText="Click this icon to register with Facebook" />
+                android:background="@drawable/face_icon"
+                android:tooltipText="@string/login_with_Facebook" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/signInPhone"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginHorizontal="25dp"
-                android:background="@drawable/phone"
+                android:layout_marginHorizontal="10dp"
                 android:padding="3dp"
-                android:tooltipText="Click this icon to register with phone" />
+                android:background="@drawable/call3_icon"
+                android:tooltipText="@string/login_with_phone" />
 
             <androidx.appcompat.widget.AppCompatImageButton
                 android:id="@+id/signInEmail"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginHorizontal="25dp"
-                android:background="@drawable/email"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginHorizontal="10dp"
+                android:background="@drawable/gmail_icon"
                 android:padding="3dp"
-                android:tooltipText="Click this icon to register with email" />
+                android:tooltipText="@string/login_with_email" />
 
         </LinearLayout>
+
 
 
     </androidx.appcompat.widget.LinearLayoutCompat>

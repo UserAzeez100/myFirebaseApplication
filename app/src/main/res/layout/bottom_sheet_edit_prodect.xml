@@ -44,13 +44,14 @@
 
 
             <!--=======================================================================================================-->
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="150dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
+                android:elevation="5dp"
                 android:layout_marginTop="30dp"
-                app:srcCompat="@drawable/img" />
+                app:srcCompat="@drawable/upload_image" />
 
             <!--=======================================================================================================-->
 

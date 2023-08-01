@@ -82,9 +82,11 @@
                     android:layout_height="50dp"
                     android:backgroundTint="@color/white"
                     android:inputType="text"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textColor="@color/black"
-                    android:padding="5dp"
+                    android:drawableStart="@drawable/profile_fill"
+                    android:drawablePadding="10dp"
+                    android:padding="6dp"
                     app:endIconMode="clear_text"
                     android:textColorHint="@color/blue500"
                     app:endIconTint="@color/white"
@@ -111,9 +113,11 @@
                     android:id="@+id/countryEt"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     app:endIconMode="clear_text"
-                    android:padding="5dp"
+                    android:drawableStart="@drawable/home_fill2"
+                    android:drawablePadding="10dp"
+                    android:padding="6dp"
                     android:textColor="@color/black"
                     app:endIconTint="@color/white"
                     android:backgroundTint="@color/white"
@@ -163,7 +167,10 @@
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/white"
                     android:inputType="textEmailAddress"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
+                    android:drawableStart="@drawable/email_icon"
+                    android:drawablePadding="10dp"
+                    android:paddingStart="6dp"
                     android:textColor="@color/black"
                     app:endIconMode="clear_text"
                     app:endIconTint="@color/white"
@@ -194,9 +201,11 @@
                     android:layout_height="50dp"
                     android:backgroundTint="@color/white"
                     android:inputType="textPassword"
-                    android:textSize="16sp"
-                    android:padding="5dp"
+                    android:textSize="15sp"
+                    android:padding="6dp"
                     android:textColor="@color/black"
+                    android:drawableStart="@drawable/password_icon"
+                    android:drawablePadding="10dp"
                     />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -214,7 +223,8 @@
                 android:visibility="gone"
                 app:helperText="+972-590000000"
                 app:helperTextTextColor="#1A237E"
-               >
+
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/phoneEt"
@@ -225,7 +235,11 @@
                     android:inputType="phone"
                     android:textSize="15dp"
                     android:padding="5dp"
-                    android:maxLength="14" />
+                    android:drawableStart="@drawable/password_icon"
+                    android:drawablePadding="10dp"
+                    android:maxLength="14" >
+
+                </com.google.android.material.textfield.TextInputEditText>
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -242,10 +256,12 @@
 
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="50dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
                 android:orientation="horizontal">
 
 
@@ -253,38 +269,38 @@
                     android:id="@+id/signInGoogle"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginHorizontal="25dp"
-                    android:background="@drawable/google"
+                    android:layout_marginHorizontal="10dp"
+                    android:background="@drawable/google_icon"
                     android:padding="3dp"
-                    android:tooltipText="Click this icon to register with google"
+                    android:tooltipText="@string/register_with_google"
                     tools:ignore="SpeakableTextPresentCheck" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/signInFacebook"
-                    android:layout_width="22dp"
+                    android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginHorizontal="25dp"
+                    android:layout_marginHorizontal="10dp"
                     android:padding="3dp"
-                    android:background="@drawable/facebook_icon"
-                    android:tooltipText="Click this icon to register with Facebook" />
+                    android:background="@drawable/face_icon"
+                    android:tooltipText="@string/register_with_Facebook" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/signInPhone"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:layout_marginHorizontal="25dp"
+                    android:layout_marginHorizontal="10dp"
                     android:padding="3dp"
-                    android:background="@drawable/phone"
-                    android:tooltipText="Click this icon to register with phone" />
+                    android:background="@drawable/call3_icon"
+                    android:tooltipText="@string/register_with_phone" />
 
                 <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/signInEmail"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginHorizontal="25dp"
-                    android:background="@drawable/email"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:background="@drawable/gmail_icon"
                     android:padding="3dp"
-                    android:tooltipText="Click this icon to register with email" />
+                    android:tooltipText="@string/register_with_email" />
 
             </LinearLayout>
 

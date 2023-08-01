@@ -29,7 +29,7 @@
                 android:layout_height="70dp"
                 android:layout_margin="6dp"
                 android:background="@color/white"
-                android:src="@drawable/img"
+                android:src="@drawable/avtar"
                 android:textDirection="locale"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

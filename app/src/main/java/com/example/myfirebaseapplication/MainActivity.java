@@ -24,6 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthCredential;
@@ -165,13 +166,17 @@ public class MainActivity extends AppCompatActivity {
                                 errorDialog();
                             }
 
-
                         } else {
                             auth.signOut();
                             errorDialog();
                             // If sign up fails, display a message to the user
                             Toast.makeText(MainActivity.this, "" + task.getException(), Toast.LENGTH_SHORT).show();
                         }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("email_EX", "onFailure: with email EXC"+e );
                     }
                 });
     }
@@ -196,9 +201,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "signInWithCredential:success");
             } else {
                 // If sign in fails:
-                Toast.makeText(this, "" + task.getException(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "fail google exception" + task.getException(), Toast.LENGTH_SHORT).show();
 
                 Log.d(TAG, "signInWithCredential:failure", task.getException());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                        Log.e("fail google exception", "onFailure: "+e );
+                Toast.makeText(MainActivity.this, ""+e, Toast.LENGTH_SHORT).show();
+
+
             }
         });
 
@@ -213,7 +227,9 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (ApiException e) {
             // Google Sign-In failed
-            Log.w(TAG, "Google sign in failed", e);
+            Log.e(TAG, "Google sign in failed", e);
+            Toast.makeText(MainActivity.this, ""+e, Toast.LENGTH_SHORT).show();
+
         }
     }
 

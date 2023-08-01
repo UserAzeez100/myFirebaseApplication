@@ -6,6 +6,8 @@ import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -203,7 +206,7 @@ public class UserProductsFragment extends Fragment implements MyInterFace {
             bottomSheetDialog = new BottomSheetDialog(requireContext());
             bottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
         }
-        bottomSheetBinding.imageView.setImageResource(R.drawable.img);
+        bottomSheetBinding.imageView.setImageResource(R.drawable.upload_image);
 
 
         bottomSheetBinding.saveBtn.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +260,11 @@ public class UserProductsFragment extends Fragment implements MyInterFace {
         });
         bottomSheetDialog.show();
         bottomSheetBinding.pageTitle.setText("Add New Prodect");
+//        bottomSheetDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//        bottomSheetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        bottomSheetDialog.getWindow().getAttributes().windowAnimations = com.facebook.R.style.Base_DialogWindowTitle_AppCompat;
+//        bottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
+
 //        Glide.with(getActivity()).load(R.drawable.img).circleCrop().into(bottomSheetBinding.imageView);
         bottomSheetBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -280,7 +288,7 @@ public class UserProductsFragment extends Fragment implements MyInterFace {
             bottomSheetDialog = new BottomSheetDialog(requireContext());
             bottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
         }
-        bottomSheetBinding.imageView.setImageResource(R.drawable.img);
+        bottomSheetBinding.imageView.setImageResource(R.drawable.upload_image);
 
 
         retrieveImageFromFireStore(imageName);//retrieve Image From FireStore and put in a image sheet
